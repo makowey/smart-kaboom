@@ -181,6 +181,28 @@ export function processTileFlip(gameState, team, row, col, tileData) {
   // Reset consecutive passes when a tile is flipped
   gameState.consecutivePasses = 0;
   
+  // Check min/max tries rule (but not if bomb was hit)
+  const gameSettings = globalThis.gameSettings || { minTries: 1, maxTries: 3 };
+  const currentTries = teamData.tilesFlippedThisTurn;
+  const hitBomb = tileData.type === 'bomb';
+  
+  // If bomb was hit, turn ends immediately - no min/max tries apply
+  if (hitBomb) {
+    continuePlay = false;
+  } else {
+    // Force continue if haven't reached minimum tries yet
+    if (currentTries < gameSettings.minTries && !continuePlay) {
+      continuePlay = true;
+      message += ` (Must flip ${gameSettings.minTries - currentTries} more tile${gameSettings.minTries - currentTries > 1 ? 's' : ''})`;
+    }
+    
+    // Force end turn if reached maximum tries
+    if (currentTries >= gameSettings.maxTries && continuePlay) {
+      continuePlay = false;
+      message += ` (Maximum ${gameSettings.maxTries} tries reached)`;
+    }
+  }
+  
   // Handle team switching or game ending
   if (!continuePlay) {
     if (teamData.canContinue) {

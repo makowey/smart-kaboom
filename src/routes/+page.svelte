@@ -17,7 +17,9 @@
   let settings = {
     team1Name: 'Thunder Hawks',
     team2Name: 'Lightning Wolves',
-    winCondition: 501
+    winCondition: 501,
+    minTries: 1,
+    maxTries: 3
   };
 
   // Load settings from localStorage on component initialization
@@ -52,7 +54,11 @@
   // Apply loaded settings to game state and global settings
   gameState.team1.name = settings.team1Name;
   gameState.team2.name = settings.team2Name;
-  globalThis.gameSettings = { winCondition: settings.winCondition };
+  globalThis.gameSettings = { 
+    winCondition: settings.winCondition,
+    minTries: settings.minTries,
+    maxTries: settings.maxTries
+  };
 
   function createFlyingCoin(points, teamName) {
     const coinId = Date.now() + Math.random();
@@ -83,8 +89,12 @@
     gameState.team1.name = settings.team1Name;
     gameState.team2.name = settings.team2Name;
     
-    // Store win condition globally for game logic to access
-    globalThis.gameSettings = { winCondition: settings.winCondition };
+    // Store settings globally for game logic to access
+    globalThis.gameSettings = { 
+      winCondition: settings.winCondition,
+      minTries: settings.minTries,
+      maxTries: settings.maxTries
+    };
     
     // Save settings to localStorage
     saveSettings();
@@ -97,7 +107,9 @@
     settings = {
       team1Name: 'Thunder Hawks',
       team2Name: 'Lightning Wolves',
-      winCondition: 501
+      winCondition: 501,
+      minTries: 1,
+      maxTries: 3
     };
   }
 
@@ -145,7 +157,11 @@
     gameState.team2.name = settings.team2Name;
     
     // Ensure global settings are set for new game
-    globalThis.gameSettings = { winCondition: settings.winCondition };
+    globalThis.gameSettings = { 
+      winCondition: settings.winCondition,
+      minTries: settings.minTries,
+      maxTries: settings.maxTries
+    };
     
     notification.show = false;
     currentMessage = '';
@@ -696,6 +712,8 @@
           <div class="text-sm text-gray-700 space-y-1 font-comic">
             <div>• 4 Bombs, 3 Lives, 2 Multipliers per board</div>
             <div>• 22 Try Again tiles (continue turn)</div>
+            <div>• Teams must flip minimum tries per turn</div>
+            <div>• Teams can continue up to maximum tries (if no bomb)</div>
             <div>• No lives + Bomb = Lose all points</div>
             <div>• Pass without flipping = no more turns for that team</div>
             <div>• Game ends when both teams are done</div>
@@ -834,6 +852,48 @@
               </div>
             </div>
 
+            <!-- Turn Rules -->
+            <div class="bg-gradient-to-br from-green-50 to-emerald-100 p-5 rounded-2xl border-3 border-green-400 shadow-lg">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-dice text-green-600 text-xl mr-3"></i>
+                <h4 class="text-xl font-bold text-gray-800 font-comic">Turn Rules</h4>
+              </div>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-bold text-gray-700 font-comic">Min Tries per Turn:</label>
+                  <div class="flex items-center gap-3">
+                    <input 
+                      type="number" 
+                      bind:value={settings.minTries}
+                      min="1"
+                      max="5"
+                      class="w-20 px-3 py-2 border-2 border-green-400 rounded-lg focus:border-green-600 focus:outline-none font-comic text-base font-semibold bg-white shadow-inner transition-all duration-300 focus:shadow-md"
+                      placeholder="1"
+                    />
+                    <div class="w-6 h-6 flex items-center justify-center text-green-600">
+                      <i class="fas fa-arrow-down text-sm"></i>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-bold text-gray-700 font-comic">Max Tries per Turn:</label>
+                  <div class="flex items-center gap-3">
+                    <input 
+                      type="number" 
+                      bind:value={settings.maxTries}
+                      min="1"
+                      max="10"
+                      class="w-20 px-3 py-2 border-2 border-green-400 rounded-lg focus:border-green-600 focus:outline-none font-comic text-base font-semibold bg-white shadow-inner transition-all duration-300 focus:shadow-md"
+                      placeholder="3"
+                    />
+                    <div class="w-6 h-6 flex items-center justify-center text-green-600">
+                      <i class="fas fa-arrow-up text-sm"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Info Panel -->
             <div class="bg-gradient-to-br from-blue-50 to-indigo-100 p-5 rounded-2xl border-3 border-blue-300 shadow-lg">
               <div class="flex items-center mb-4">
@@ -852,6 +912,10 @@
                 <div class="flex items-center">
                   <i class="fas fa-clock text-blue-500 mr-2"></i>
                   <span>First team to reach target wins instantly</span>
+                </div>
+                <div class="flex items-center">
+                  <i class="fas fa-dice text-purple-500 mr-2"></i>
+                  <span>Teams must flip min tries, can continue to max</span>
                 </div>
               </div>
             </div>
