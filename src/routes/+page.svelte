@@ -54,7 +54,6 @@
   /* Fallback styles if Tailwind doesn't load */
   .fallback-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #60a5fa, #3b82f6, #2563eb);
     padding: 2rem;
     font-family: 'Comic Neue', cursive, sans-serif;
   }
@@ -83,21 +82,21 @@
   }
 </style>
 
-<div class="min-h-screen bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 py-8 fallback-container">
+<div class="min-h-screen py-8 fallback-container">
   <div class="mx-auto px-4" style="max-width: 1800px;">
     <h1 class="text-5xl font-bold text-center mb-8 text-white drop-shadow-lg fallback-title" style="font-family: 'Alfa Slab One', cursive;">Smart Kaboom</h1>
     
     {#if !gameState.gameOver}
       <div class="text-center mb-6">
-        <p class="text-xl font-semibold text-white drop-shadow font-comic">Current Turn: <span class="font-bold {currentTeamName === 'Thunder Hawks' ? 'text-orange-400' : 'text-purple-400'}">{currentTeamName}</span></p>
+        <p class="text-xl font-semibold text-white drop-shadow font-comic">Current Turn: <span class="font-bold text-white">{currentTeamName}</span></p>
       </div>
     {:else}
       <div class="text-center mb-6">
         <h2 class="text-4xl font-bold text-white drop-shadow-lg mb-4" style="font-family: 'Alfa Slab One', cursive;">Game Over!</h2>
-        <p class="text-2xl font-bold drop-shadow font-comic">
-          {gameState.team1.score > gameState.team2.score ? '🏆 <span class="text-orange-400">Thunder Hawks</span> Win! 🏆' : 
-           gameState.team2.score > gameState.team1.score ? '🏆 <span class="text-purple-400">Lightning Wolves</span> Win! 🏆' : 
-           '🤝 <span class="text-white">It\'s a Tie!</span> 🤝'}
+        <p class="text-2xl font-bold drop-shadow font-comic text-white">
+          {gameState.team1.score > gameState.team2.score ? '🏆 Thunder Hawks Win! 🏆' : 
+           gameState.team2.score > gameState.team1.score ? '🏆 Lightning Wolves Win! 🏆' : 
+           '🤝 It\'s a Tie! 🤝'}
         </p>
         <button 
           class="mt-6 px-8 py-3 bg-white text-blue-600 font-bold rounded-xl hover:bg-gray-100 transition-colors shadow-lg font-comic"

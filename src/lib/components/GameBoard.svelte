@@ -20,7 +20,7 @@
   }
 </script>
 
-<div class="game-board p-4 bg-white bg-opacity-90 rounded-xl shadow-2xl backdrop-blur-sm transition-all duration-300 {isActive ? 'border-4 border-yellow-400 shadow-yellow-400/50 glow-active' : 'border-4 border-transparent'}">
+<div class="game-board p-6 rounded-2xl shadow-2xl backdrop-blur-sm transition-all duration-300 {teamName === 'Thunder Hawks' ? 'bg-orange-400 bg-opacity-20 border-4 border-orange-500' : 'bg-purple-400 bg-opacity-20 border-4 border-purple-500'} {isActive ? 'glow-active' : 'inactive-board'}">
   <div class="text-center mb-4">
     <h2 class="text-3xl font-bold mb-3 text-white drop-shadow-lg" style="font-family: 'Alfa Slab One', cursive; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">{teamName}</h2>
     <div class="flex justify-center items-center gap-6 text-lg">
@@ -58,27 +58,36 @@
 <style>
   .glow-active {
     box-shadow: 
-      0 0 20px rgba(255, 255, 255, 0.6),
-      0 0 40px rgba(255, 255, 255, 0.4),
-      0 0 60px rgba(255, 255, 255, 0.2),
-      inset 0 0 20px rgba(255, 255, 255, 0.1);
+      0 0 25px rgba(255, 255, 255, 0.8),
+      0 0 50px rgba(255, 255, 255, 0.6),
+      0 0 75px rgba(255, 255, 255, 0.4),
+      0 0 100px rgba(255, 255, 255, 0.2),
+      inset 0 0 25px rgba(255, 255, 255, 0.2);
     animation: pulse-glow 2s ease-in-out infinite alternate;
+    border: 4px solid rgba(255, 255, 255, 0.8) !important;
   }
   
   @keyframes pulse-glow {
     from {
       box-shadow: 
-        0 0 20px rgba(255, 255, 255, 0.6),
-        0 0 40px rgba(255, 255, 255, 0.4),
-        0 0 60px rgba(255, 255, 255, 0.2),
-        inset 0 0 20px rgba(255, 255, 255, 0.1);
+        0 0 25px rgba(255, 255, 255, 0.8),
+        0 0 50px rgba(255, 255, 255, 0.6),
+        0 0 75px rgba(255, 255, 255, 0.4),
+        0 0 100px rgba(255, 255, 255, 0.2),
+        inset 0 0 25px rgba(255, 255, 255, 0.2);
     }
     to {
       box-shadow: 
-        0 0 30px rgba(255, 255, 255, 0.8),
-        0 0 60px rgba(255, 255, 255, 0.6),
-        0 0 90px rgba(255, 255, 255, 0.4),
-        inset 0 0 30px rgba(255, 255, 255, 0.2);
+        0 0 35px rgba(255, 255, 255, 1),
+        0 0 70px rgba(255, 255, 255, 0.8),
+        0 0 105px rgba(255, 255, 255, 0.6),
+        0 0 140px rgba(255, 255, 255, 0.4),
+        inset 0 0 35px rgba(255, 255, 255, 0.3);
     }
+  }
+  
+  .inactive-board {
+    opacity: 0.6;
+    filter: grayscale(0.3) brightness(0.8);
   }
 </style>
