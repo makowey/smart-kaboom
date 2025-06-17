@@ -11,12 +11,109 @@
   };
   let notificationTimeout;
   let currentMessage = '';
+  let showLegend = false;
+  let showSettings = false;
+  let flyingCoins = [];
+  let settings = {
+    team1Name: 'Thunder Hawks',
+    team2Name: 'Lightning Wolves',
+    winCondition: 501
+  };
+
+  // Load settings from localStorage on component initialization
+  function loadSettings() {
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const savedSettings = localStorage.getItem('smartKaboomSettings');
+        if (savedSettings) {
+          const parsed = JSON.parse(savedSettings);
+          settings = { ...settings, ...parsed };
+        }
+      } catch (error) {
+        console.warn('Failed to load settings from localStorage:', error);
+      }
+    }
+  }
+
+  // Save settings to localStorage
+  function saveSettings() {
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem('smartKaboomSettings', JSON.stringify(settings));
+      } catch (error) {
+        console.warn('Failed to save settings to localStorage:', error);
+      }
+    }
+  }
+
+  // Initialize settings on component mount
+  loadSettings();
+  
+  // Apply loaded settings to game state and global settings
+  gameState.team1.name = settings.team1Name;
+  gameState.team2.name = settings.team2Name;
+  globalThis.gameSettings = { winCondition: settings.winCondition };
+
+  function createFlyingCoin(points, teamName) {
+    const coinId = Date.now() + Math.random();
+    const coin = {
+      id: coinId,
+      points: points,
+      team: teamName
+    };
+    
+    flyingCoins = [...flyingCoins, coin];
+    
+    // Remove coin after animation completes
+    setTimeout(() => {
+      flyingCoins = flyingCoins.filter(c => c.id !== coinId);
+    }, 2000);
+  }
+
+  function toggleLegend() {
+    showLegend = !showLegend;
+  }
+
+  function toggleSettings() {
+    showSettings = !showSettings;
+  }
+
+  function applySettings() {
+    // Update team names in game state
+    gameState.team1.name = settings.team1Name;
+    gameState.team2.name = settings.team2Name;
+    
+    // Store win condition globally for game logic to access
+    globalThis.gameSettings = { winCondition: settings.winCondition };
+    
+    // Save settings to localStorage
+    saveSettings();
+    
+    showSettings = false;
+    gameState = gameState; // Trigger reactivity
+  }
+
+  function resetSettings() {
+    settings = {
+      team1Name: 'Thunder Hawks',
+      team2Name: 'Lightning Wolves',
+      winCondition: 501
+    };
+  }
 
   function handleTileFlip(team, row, col, tileData) {
     if (gameState.currentTeam !== team || gameState.gameOver) return;
     
     const previousTeam = gameState.currentTeam;
     const result = processTileFlip(gameState, team, row, col, tileData);
+    
+    // Create flying coin effect for points
+    if (tileData.type === 'points' || tileData.type === 'try_again') {
+      const actualPoints = tileData.type === 'points' 
+        ? tileData.value * gameState[team].multiplier 
+        : tileData.value;
+      createFlyingCoin(actualPoints, gameState[team].name);
+    }
     
     // Show tile result message
     currentMessage = `${gameState[team].name}: ${result.message}`;
@@ -43,8 +140,16 @@
 
   function resetGame() {
     gameState = createGameState();
+    // Apply current settings to new game
+    gameState.team1.name = settings.team1Name;
+    gameState.team2.name = settings.team2Name;
+    
+    // Ensure global settings are set for new game
+    globalThis.gameSettings = { winCondition: settings.winCondition };
+    
     notification.show = false;
     currentMessage = '';
+    clearTimeout(notificationTimeout);
   }
 
   function passTurn() {
@@ -54,16 +159,50 @@
     const otherTeam = gameState.currentTeam === 'team1' ? 'team2' : 'team1';
     const otherTeamData = gameState[otherTeam];
     
-    currentMessage = `${currentTeamData.name} passed their turn!`;
-    
-    // Check if the other team has all tiles flipped
-    if (otherTeamData.allTilesFlipped) {
-      // If the other team already flipped all tiles and current team passes, game ends
-      gameState.gameOver = true;
-      currentMessage = `${currentTeamData.name} passed! Game Over!`;
+    // If team hasn't flipped any tiles this turn, they pass permanently
+    if (currentTeamData.tilesFlippedThisTurn === 0) {
+      currentTeamData.hasPassedTurn = true;
+      currentMessage = `${currentTeamData.name} passed and won't get another turn!`;
     } else {
-      // Switch to other team
-      gameState.currentTeam = otherTeam;
+      currentMessage = `${currentTeamData.name} passed their turn!`;
+    }
+    
+    // Check if both teams have passed or finished
+    if ((gameState.team1.hasPassedTurn || gameState.team1.allTilesFlipped) && 
+        (gameState.team2.hasPassedTurn || gameState.team2.allTilesFlipped)) {
+      gameState.gameOver = true;
+      // Determine winner by highest score
+      if (gameState.team1.score > gameState.team2.score) {
+        gameState.winner = 'team1';
+      } else if (gameState.team2.score > gameState.team1.score) {
+        gameState.winner = 'team2';
+      }
+      // If scores are equal, winner remains null (tie)
+      currentMessage = `Both teams are done! Game Over!`;
+    } else {
+      // Switch to next available team
+      let nextTeam = otherTeam;
+      
+      // If the other team has passed permanently or finished all tiles, 
+      // check if current team can continue
+      if (gameState[otherTeam].hasPassedTurn || gameState[otherTeam].allTilesFlipped) {
+        // Current team can only continue if they haven't passed permanently
+        if (!currentTeamData.hasPassedTurn && !currentTeamData.allTilesFlipped) {
+          nextTeam = gameState.currentTeam;
+          currentMessage += ` Continuing turn...`;
+        } else {
+          // Both teams are done
+          gameState.gameOver = true;
+          currentMessage = `Game Over!`;
+        }
+      }
+      
+      // Switch turns only if game isn't over
+      if (!gameState.gameOver) {
+        // Reset tiles flipped counter for next team's turn
+        gameState[nextTeam].tilesFlippedThisTurn = 0;
+        gameState.currentTeam = nextTeam;
+      }
     }
     
     // Clear message after 2 seconds
@@ -109,35 +248,338 @@
       grid-template-columns: 1fr 1fr;
     }
   }
+  
+  .modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.7) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 99999 !important;
+  }
+  
+  .modal-content {
+    background: white !important;
+    padding: 32px !important;
+    border-radius: 20px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    border: 6px solid #3b82f6 !important;
+    width: 800px !important;
+    max-width: 90vw !important;
+    margin: 16px !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+  
+  .message-display {
+    position: fixed !important;
+    top: 16px !important;
+    right: 16px !important;
+    background: white !important;
+    padding: 12px 16px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+    border: 2px solid #d1d5db !important;
+    max-width: 20rem !important;
+    z-index: 50000 !important;
+  }
+  
+  .settings-modal-content {
+    background: white !important;
+    padding: 32px !important;
+    border-radius: 20px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    border: 6px solid #10b981 !important;
+    width: 700px !important;
+    max-width: 90vw !important;
+    margin: 16px !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+  
+  .flying-coin {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 60000;
+    animation: coin-fly 2s ease-out forwards;
+  }
+  
+  .coin-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  }
+  
+  .coin-image {
+    width: 60px;
+    height: 60px;
+    animation: coin-spin 2s linear infinite;
+  }
+  
+  .coin-points {
+    font-family: 'Alfa Slab One', cursive;
+    font-size: 24px;
+    font-weight: bold;
+    color: #fbbf24;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    margin-top: 8px;
+    animation: fade-scale 2s ease-out forwards;
+  }
+  
+  @keyframes coin-fly {
+    0% {
+      transform: translate(-50%, -50%) scale(0.5);
+      opacity: 0;
+    }
+    20% {
+      transform: translate(-50%, -60%) scale(1.2);
+      opacity: 1;
+    }
+    40% {
+      transform: translate(-50%, -80%) scale(1);
+      opacity: 1;
+    }
+    70% {
+      transform: translate(-50%, -120%) scale(0.8);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translate(-50%, -200%) scale(0.3);
+      opacity: 0;
+    }
+  }
+  
+  @keyframes coin-spin {
+    0% {
+      transform: rotateY(0deg);
+    }
+    50% {
+      transform: rotateY(180deg);
+    }
+    100% {
+      transform: rotateY(360deg);
+    }
+  }
+  
+  @keyframes fade-scale {
+    0% {
+      transform: scale(0.5);
+      opacity: 0;
+    }
+    30% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+    70% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+  }
+  
+  /* Custom Button Base Style */
+  .svg-button {
+    border: none;
+    position: relative;
+    min-height: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.95) !important;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    font-weight: bold;
+    padding: 16px 24px;
+    margin: 4px;
+    border-radius: 15px;
+    box-shadow: 
+      0 4px 8px rgba(0, 0, 0, 0.2),
+      0 2px 4px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  .svg-button:hover {
+    transform: translateY(-2px);
+    color: rgba(255, 255, 255, 1) !important;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+    box-shadow: 
+      0 6px 12px rgba(0, 0, 0, 0.3),
+      0 3px 6px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .svg-button:active {
+    transform: translateY(-1px) scale(0.98);
+    box-shadow: 
+      0 3px 6px rgba(0, 0, 0, 0.2),
+      0 1px 3px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  .svg-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: rgba(255, 255, 255, 0.5) !important;
+    transform: none;
+    box-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  .svg-button i {
+    color: rgba(255, 255, 255, 0.9) !important;
+    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.6));
+  }
+  
+  .svg-button:hover i {
+    color: rgba(255, 255, 255, 1) !important;
+    filter: drop-shadow(1px 1px 3px rgba(0, 0, 0, 0.8));
+  }
+  
+  /* Button Color Variations */
+  .pass-button {
+    background: linear-gradient(145deg, rgba(255, 165, 0, 0.9), rgba(255, 140, 0, 0.8));
+  }
+  
+  .pass-button:hover {
+    background: linear-gradient(145deg, rgba(255, 165, 0, 1), rgba(255, 140, 0, 0.9));
+  }
+  
+  .help-button {
+    background: linear-gradient(145deg, rgba(99, 102, 241, 0.9), rgba(79, 70, 229, 0.8));
+  }
+  
+  .help-button:hover {
+    background: linear-gradient(145deg, rgba(99, 102, 241, 1), rgba(79, 70, 229, 0.9));
+  }
+  
+  .settings-button {
+    background: linear-gradient(145deg, rgba(34, 197, 94, 0.9), rgba(22, 163, 74, 0.8));
+  }
+  
+  .settings-button:hover {
+    background: linear-gradient(145deg, rgba(34, 197, 94, 1), rgba(22, 163, 74, 0.9));
+  }
+  
+  .new-game-button {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(243, 244, 246, 0.9));
+    color: rgba(59, 130, 246, 0.9) !important;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+  
+  .new-game-button:hover {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(248, 250, 252, 0.95));
+    color: rgba(59, 130, 246, 1) !important;
+    text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.9);
+    border-color: rgba(59, 130, 246, 0.5);
+  }
+  
+  .new-game-button i {
+    color: rgba(59, 130, 246, 0.85) !important;
+    filter: drop-shadow(1px 1px 2px rgba(255, 255, 255, 0.8));
+  }
+  
+  .new-game-button:hover i {
+    color: rgba(59, 130, 246, 1) !important;
+  }
+  
+  .modal-button {
+    background: linear-gradient(145deg, rgba(59, 130, 246, 0.9), rgba(37, 99, 235, 0.8));
+  }
+  
+  .modal-button:hover {
+    background: linear-gradient(145deg, rgba(59, 130, 246, 1), rgba(37, 99, 235, 0.9));
+  }
+  
+  .apply-button {
+    background: linear-gradient(145deg, rgba(34, 197, 94, 0.9), rgba(22, 163, 74, 0.8));
+  }
+  
+  .apply-button:hover {
+    background: linear-gradient(145deg, rgba(34, 197, 94, 1), rgba(22, 163, 74, 0.9));
+  }
+  
+  .reset-button {
+    background: linear-gradient(145deg, rgba(107, 114, 128, 0.9), rgba(75, 85, 99, 0.8));
+  }
+  
+  .reset-button:hover {
+    background: linear-gradient(145deg, rgba(107, 114, 128, 1), rgba(75, 85, 99, 0.9));
+  }
+  
+  .cancel-button {
+    background: linear-gradient(145deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.8));
+  }
+  
+  .cancel-button:hover {
+    background: linear-gradient(145deg, rgba(239, 68, 68, 1), rgba(220, 38, 38, 0.9));
+  }
 </style>
 
 <div class="min-h-screen py-8 fallback-container">
   <div class="mx-auto px-4" style="max-width: 1800px;">
-    <h1 class="text-5xl font-bold text-center mb-8 text-white drop-shadow-lg fallback-title" style="font-family: 'Alfa Slab One', cursive;">Smart Kaboom</h1>
+    <div class="flex items-center justify-center mb-4 gap-6">
+      <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 125px; height: 125px;" />
+      <h1 class="text-5xl font-bold text-white drop-shadow-lg fallback-title" style="font-family: 'Alfa Slab One', cursive; letter-spacing: 0.1em;">Smart Kaboom</h1>
+      <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 125px; height: 125px;" />
+    </div>
     
     {#if !gameState.gameOver}
       <div class="text-center mb-6">
-        <p class="text-xl font-semibold text-white drop-shadow font-comic">Current Turn: <span class="font-bold text-white">{currentTeamName}</span></p>
-        <button 
-          class="mt-4 px-8 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 font-comic border-2 border-yellow-400"
-          on:click={passTurn}
-        >
-          <i class="fas fa-hand-paper mr-2 text-lg"></i>Pass Turn
-        </button>
+        <div class="flex gap-4 justify-center mb-4 flex-wrap">
+          <button 
+            class="svg-button pass-button px-12 py-5 font-bold transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-110 font-comic {gameState[gameState.currentTeam].hasPassedTurn || !gameState[gameState.currentTeam].canContinue ? 'opacity-50 cursor-not-allowed' : ''}"
+            on:click={!gameState[gameState.currentTeam].hasPassedTurn && gameState[gameState.currentTeam].canContinue ? passTurn : null}
+            disabled={gameState[gameState.currentTeam].hasPassedTurn || !gameState[gameState.currentTeam].canContinue}
+          >
+            <i class="fas fa-hand-paper mr-12 text-2xl"></i>Pass Turn
+          </button>
+          
+          <button 
+            class="svg-button help-button px-10 py-5 font-bold transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-110 font-comic"
+            on:click={toggleLegend}
+          >
+            <i class="fas fa-question-circle mr-12 text-2xl"></i>Help
+          </button>
+          
+          <button 
+            class="svg-button settings-button px-10 py-5 font-bold transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-110 font-comic"
+            on:click={toggleSettings}
+          >
+            <i class="fas fa-cog mr-12 text-2xl"></i>Settings
+          </button>
+        </div>
       </div>
     {:else}
       <div class="text-center mb-6">
         <h2 class="text-4xl font-bold text-white drop-shadow-lg mb-4" style="font-family: 'Alfa Slab One', cursive;">Game Over!</h2>
         <p class="text-2xl font-bold drop-shadow font-comic text-white">
-          {gameState.team1.score > gameState.team2.score ? '🏆 Thunder Hawks Win! 🏆' : 
+          {gameState.winner ? `🏆 ${gameState[gameState.winner].name} Win! 🏆` :
+           gameState.team1.score > gameState.team2.score ? '🏆 Thunder Hawks Win! 🏆' : 
            gameState.team2.score > gameState.team1.score ? '🏆 Lightning Wolves Win! 🏆' : 
            '🤝 It\'s a Tie! 🤝'}
         </p>
         <button 
-          class="mt-6 px-8 py-3 bg-white text-blue-600 font-bold rounded-xl hover:bg-gray-100 transition-colors shadow-lg font-comic"
+          class="svg-button new-game-button mt-6 px-10 py-4 font-bold transition-colors shadow-lg font-comic"
           on:click={resetGame}
         >
-          <i class="fas fa-gamepad mr-2"></i>New Game
+          <i class="fas fa-gamepad mr-12 text-2xl"></i>New Game
         </button>
       </div>
     {/if}
@@ -145,97 +587,312 @@
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8 fallback-grid justify-center">
       <div class="relative">
         <GameBoard 
-          teamName="Thunder Hawks" 
+          teamName={settings.team1Name}
+          teamId="team1"
           onTileFlip={handleTileFlip}
           flippedTiles={gameState.team1.flippedTiles}
           score={gameState.team1.score}
           lives={gameState.team1.lives}
           multiplier={gameState.team1.multiplier}
-          isActive={gameState.currentTeam === 'team1' && !gameState.gameOver}
+          isActive={gameState.currentTeam === 'team1' && !gameState.gameOver && !gameState.team1.hasPassedTurn && gameState.team1.canContinue}
+          hasPassedTurn={gameState.team1.hasPassedTurn}
+          canContinue={gameState.team1.canContinue}
+          allTilesFlipped={gameState.team1.allTilesFlipped}
         />
-        {#if gameState.currentTeam === 'team1' && !gameState.gameOver}
+        {#if gameState.currentTeam === 'team1' && !gameState.gameOver && !gameState.team1.hasPassedTurn && gameState.team1.canContinue}
           <div class="absolute -top-2 -left-2 w-6 h-6 bg-yellow-400 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
         {/if}
       </div>
       
       <div class="relative">
         <GameBoard 
-          teamName="Lightning Wolves" 
+          teamName={settings.team2Name}
+          teamId="team2"
           onTileFlip={handleTileFlip}
           flippedTiles={gameState.team2.flippedTiles}
           score={gameState.team2.score}
           lives={gameState.team2.lives}
           multiplier={gameState.team2.multiplier}
-          isActive={gameState.currentTeam === 'team2' && !gameState.gameOver}
+          isActive={gameState.currentTeam === 'team2' && !gameState.gameOver && !gameState.team2.hasPassedTurn && gameState.team2.canContinue}
+          hasPassedTurn={gameState.team2.hasPassedTurn}
+          canContinue={gameState.team2.canContinue}
+          allTilesFlipped={gameState.team2.allTilesFlipped}
         />
-        {#if gameState.currentTeam === 'team2' && !gameState.gameOver}
+        {#if gameState.currentTeam === 'team2' && !gameState.gameOver && !gameState.team2.hasPassedTurn && gameState.team2.canContinue}
           <div class="absolute -top-2 -left-2 w-6 h-6 bg-yellow-400 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
         {/if}
       </div>
     </div>
   </div>
   
-  <!-- Game Legend -->
-  <div class="fixed top-4 left-4 bg-white bg-opacity-95 p-4 rounded-xl shadow-xl border-2 border-gray-300 max-w-xs backdrop-blur-sm" style="z-index: 10000;">
-    <h3 class="text-lg font-bold text-gray-800 font-alfa mb-3 text-center">Game Legend</h3>
-    
-    <div class="space-y-2 text-sm">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center">
-          <img src="/assets/coin.svg" alt="Points" class="w-4 h-4 mr-2" />
-          <span class="font-comic text-gray-700">Points</span>
+  <!-- Legend Modal -->
+  {#if showLegend}
+    <div class="modal-overlay" on:click={toggleLegend}>
+      <div class="modal-content" on:click|stopPropagation>
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-2xl font-bold text-gray-800 text-center flex-1" style="font-family: 'Alfa Slab One', cursive;">Game Legend</h3>
+          <button 
+            class="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+            on:click={toggleLegend}
+          >
+            ×
+          </button>
         </div>
-        <span class="text-xs text-gray-600">5-100 pts</span>
-      </div>
-      
-      <div class="flex items-center justify-between">
-        <div class="flex items-center">
-          <img src="/assets/bomb.svg" alt="Bomb" class="w-4 h-4 mr-2" />
-          <span class="font-comic text-gray-700">Bomb</span>
+        
+        <div class="grid grid-cols-2 gap-6">
+          <div class="flex flex-col items-center p-4 bg-green-50 rounded-xl border-3 border-green-200">
+            <div class="flex items-center justify-center w-32 h-32 mb-3">
+              <img src="/assets/coin.svg" alt="Points" style="max-width: 150px; max-height: 150px; width: auto; height: auto;" />
+            </div>
+            <span class="font-comic text-gray-800 font-bold text-xl">Points</span>
+            <span class="text-gray-600 font-bold text-lg">5-100 pts</span>
+            <p class="text-sm text-gray-600 text-center mt-2">Collect points to win the game</p>
+          </div>
+          
+          <div class="flex flex-col items-center p-4 bg-red-50 rounded-xl border-3 border-red-200">
+            <div class="flex items-center justify-center w-32 h-32 mb-3">
+              <img src="/assets/bomb.svg" alt="Bomb" style="max-width: 150px; max-height: 150px; width: auto; height: auto;" />
+            </div>
+            <span class="font-comic text-gray-800 font-bold text-xl">Bomb</span>
+            <span class="text-gray-600 font-bold text-lg">-1 life</span>
+            <p class="text-sm text-gray-600 text-center mt-2">Lose a life, or all points if no lives left</p>
+          </div>
+          
+          <div class="flex flex-col items-center p-4 bg-pink-50 rounded-xl border-3 border-pink-200">
+            <div class="flex items-center justify-center w-32 h-32 mb-3">
+              <i class="fas fa-heart text-red-500" style="font-size: 120px;"></i>
+            </div>
+            <span class="font-comic text-gray-800 font-bold text-xl">Life</span>
+            <span class="text-gray-600 font-bold text-lg">+1 life</span>
+            <p class="text-sm text-gray-600 text-center mt-2">Gain an extra life for protection</p>
+          </div>
+          
+          <div class="flex flex-col items-center p-4 bg-purple-50 rounded-xl border-3 border-purple-200">
+            <div class="flex items-center justify-center w-32 h-32 mb-3">
+              <i class="fas fa-star text-yellow-500" style="font-size: 120px;"></i>
+            </div>
+            <span class="font-comic text-gray-800 font-bold text-xl">Multiplier</span>
+            <span class="text-gray-600 font-bold text-lg">x2 all pts</span>
+            <p class="text-sm text-gray-600 text-center mt-2">Instantly doubles all your points</p>
+          </div>
+          
+          <div class="flex flex-col items-center p-4 bg-yellow-100 rounded-xl border-3 border-yellow-300 col-span-2">
+            <div class="flex items-center justify-center w-32 h-32 mb-3">
+              <img src="/assets/coin.svg" alt="Try Again" style="max-width: 150px; max-height: 150px; width: auto; height: auto;" />
+            </div>
+            <span class="font-comic text-gray-800 font-bold text-xl">Try Again</span>
+            <span class="text-gray-600 font-bold text-lg">+2 pts + Continue</span>
+            <p class="text-sm text-gray-600 text-center mt-2">Get 2 points and continue your turn</p>
+          </div>
         </div>
-        <span class="text-xs text-gray-600">-1 life</span>
-      </div>
-      
-      <div class="flex items-center justify-between">
-        <div class="flex items-center">
-          <i class="fas fa-heart text-red-500 text-sm mr-2"></i>
-          <span class="font-comic text-gray-700">Life</span>
+        
+        <div class="mt-4 pt-4 border-t-2 border-gray-300">
+          <h4 class="font-bold text-gray-800 font-comic mb-2 text-xl">🏆 How to Win:</h4>
+          <div class="bg-yellow-50 p-3 rounded-lg border-2 border-yellow-300 mb-3">
+            <div class="text-lg font-bold text-yellow-800 font-comic text-center">First team to reach {settings.winCondition}+ points wins instantly!</div>
+          </div>
+          
+          <h4 class="font-bold text-gray-800 font-comic mb-2">Game Rules:</h4>
+          <div class="text-sm text-gray-700 space-y-1 font-comic">
+            <div>• 4 Bombs, 3 Lives, 2 Multipliers per board</div>
+            <div>• 22 Try Again tiles (continue turn)</div>
+            <div>• No lives + Bomb = Lose all points</div>
+            <div>• Pass without flipping = no more turns for that team</div>
+            <div>• Game ends when both teams are done</div>
+            <div>• Highest score wins when game ends</div>
+          </div>
+          
+          <h4 class="font-bold text-gray-800 font-comic mb-2 mt-4">Team Status Indicators:</h4>
+          <div class="text-sm text-gray-700 space-y-2 font-comic">
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-4 bg-yellow-400 rounded-full animate-pulse border border-white"></div>
+              <span>Active team (can play tiles)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="bg-red-600 text-white px-2 py-1 rounded-full text-xs font-bold">
+                <i class="fas fa-flag mr-1"></i>PASSED
+              </div>
+              <span>Team passed permanently (no more turns)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="bg-gray-600 text-white px-2 py-1 rounded-full text-xs font-bold">
+                <i class="fas fa-skull mr-1"></i>OUT
+              </div>
+              <span>Team lost all lives (eliminated)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="bg-green-600 text-white px-2 py-1 rounded-full text-xs font-bold">
+                <i class="fas fa-check mr-1"></i>DONE
+              </div>
+              <span>Team finished all tiles (board complete)</span>
+            </div>
+          </div>
         </div>
-        <span class="text-xs text-gray-600">+1 life</span>
-      </div>
-      
-      <div class="flex items-center justify-between">
-        <div class="flex items-center">
-          <i class="fas fa-star text-yellow-500 text-sm mr-2"></i>
-          <span class="font-comic text-gray-700">Multiplier</span>
-        </div>
-        <span class="text-xs text-gray-600">x2 all pts</span>
-      </div>
-      
-      <div class="flex items-center justify-between bg-yellow-100 px-2 py-1 rounded">
-        <div class="flex items-center">
-          <img src="/assets/coin.svg" alt="Try Again" class="w-4 h-4 mr-2" />
-          <span class="font-comic text-gray-700">Try Again</span>
-        </div>
-        <span class="text-xs text-gray-600">+2 pts</span>
+        
+        <button 
+          class="svg-button modal-button mt-4 w-full px-6 py-3 font-bold transition-colors font-comic"
+          on:click={toggleLegend}
+        >
+          Got it!
+        </button>
       </div>
     </div>
-    
-    <div class="mt-3 pt-3 border-t border-gray-300">
-      <div class="text-xs text-gray-600 space-y-1">
-        <div>• 4 Bombs, 3 Lives, 2 Multipliers</div>
-        <div>• 22 Try Again tiles</div>
-        <div>• No lives + Bomb = Lose all points</div>
-      </div>
-    </div>
-  </div>
+  {/if}
 
   <!-- Fixed message display -->
   {#if currentMessage}
-    <div class="fixed top-4 right-4 bg-white px-4 py-3 rounded-lg shadow-xl border-2 border-gray-300 max-w-sm" style="z-index: 10000;">
+    <div class="message-display">
       <p class="text-gray-800 font-bold font-comic text-sm">{currentMessage}</p>
     </div>
   {/if}
+  
+  <!-- Settings Modal -->
+  {#if showSettings}
+    <div class="modal-overlay" on:click={toggleSettings}>
+      <div class="settings-modal-content" on:click|stopPropagation>
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-3xl font-bold text-gray-800 text-center flex-1" style="font-family: 'Alfa Slab One', cursive;">Game Settings</h3>
+          <button 
+            class="text-gray-500 hover:text-gray-700 text-3xl font-bold"
+            on:click={toggleSettings}
+          >
+            ×
+          </button>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Team Names Column -->
+          <div class="space-y-6">
+            <!-- Team 1 -->
+            <div class="bg-gradient-to-br from-orange-50 to-amber-100 p-5 rounded-2xl border-3 border-orange-300 shadow-lg">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-flag text-orange-600 text-xl mr-3"></i>
+                <h4 class="text-xl font-bold text-gray-800 font-comic">Team 1</h4>
+              </div>
+              <div class="space-y-3">
+                <label class="block text-sm font-bold text-gray-700 font-comic">Team Name:</label>
+                <div class="flex items-center gap-3">
+                  <input 
+                    type="text" 
+                    bind:value={settings.team1Name}
+                    class="w-64 px-4 py-3 border-2 border-orange-300 rounded-lg focus:border-orange-500 focus:outline-none font-comic text-base font-semibold bg-white shadow-inner transition-all duration-300 focus:shadow-md"
+                    placeholder="Enter team 1 name"
+                  />
+                  <div class="w-8 h-8 flex items-center justify-center text-orange-600">
+                    <i class="fas fa-users text-lg"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Team 2 -->
+            <div class="bg-gradient-to-br from-purple-50 to-pink-100 p-5 rounded-2xl border-3 border-purple-300 shadow-lg">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-flag text-purple-600 text-xl mr-3"></i>
+                <h4 class="text-xl font-bold text-gray-800 font-comic">Team 2</h4>
+              </div>
+              <div class="space-y-3">
+                <label class="block text-sm font-bold text-gray-700 font-comic">Team Name:</label>
+                <div class="flex items-center gap-3">
+                  <input 
+                    type="text" 
+                    bind:value={settings.team2Name}
+                    class="w-64 px-4 py-3 border-2 border-purple-300 rounded-lg focus:border-purple-500 focus:outline-none font-comic text-base font-semibold bg-white shadow-inner transition-all duration-300 focus:shadow-md"
+                    placeholder="Enter team 2 name"
+                  />
+                  <div class="w-8 h-8 flex items-center justify-center text-purple-600">
+                    <i class="fas fa-users text-lg"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Win Condition Column -->
+          <div class="space-y-6">
+            <div class="bg-gradient-to-br from-yellow-50 to-amber-100 p-5 rounded-2xl border-3 border-yellow-400 shadow-lg">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-trophy text-yellow-600 text-xl mr-3"></i>
+                <h4 class="text-xl font-bold text-gray-800 font-comic">Win Condition</h4>
+              </div>
+              <div class="space-y-3">
+                <label class="block text-sm font-bold text-gray-700 font-comic">Points to Win:</label>
+                <div class="flex items-center gap-3">
+                  <input 
+                    type="number" 
+                    bind:value={settings.winCondition}
+                    min="100"
+                    max="10000"
+                    step="50"
+                    class="w-32 px-4 py-3 border-2 border-yellow-400 rounded-lg focus:border-yellow-600 focus:outline-none font-comic text-base font-semibold bg-white shadow-inner transition-all duration-300 focus:shadow-md"
+                    placeholder="501"
+                  />
+                  <div class="w-8 h-8 flex items-center justify-center text-yellow-600">
+                    <i class="fas fa-coins text-lg"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-100 p-5 rounded-2xl border-3 border-blue-300 shadow-lg">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-info-circle text-blue-600 text-xl mr-3"></i>
+                <h4 class="text-xl font-bold text-gray-800 font-comic">Game Info</h4>
+              </div>
+              <div class="space-y-2 text-sm text-gray-700 font-comic">
+                <div class="flex items-center">
+                  <i class="fas fa-star text-yellow-500 mr-2"></i>
+                  <span>Default: 501 points</span>
+                </div>
+                <div class="flex items-center">
+                  <i class="fas fa-chart-line text-green-500 mr-2"></i>
+                  <span>Range: 100-10000</span>
+                </div>
+                <div class="flex items-center">
+                  <i class="fas fa-clock text-blue-500 mr-2"></i>
+                  <span>First team to reach target wins instantly</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex gap-4 mt-8">
+          <button 
+            class="svg-button apply-button flex-1 px-8 py-4 font-bold transition-colors font-comic"
+            on:click={applySettings}
+          >
+            <i class="fas fa-check mr-12 text-xl"></i>Apply Settings
+          </button>
+          
+          <button 
+            class="svg-button reset-button px-8 py-4 font-bold transition-colors font-comic"
+            on:click={resetSettings}
+          >
+            <i class="fas fa-undo mr-12 text-xl"></i>Reset
+          </button>
+          
+          <button 
+            class="svg-button cancel-button px-8 py-4 font-bold transition-colors font-comic"
+            on:click={toggleSettings}
+          >
+            <i class="fas fa-times mr-12 text-xl"></i>Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  {/if}
+  
+  <!-- Flying Coins Animation -->
+  {#each flyingCoins as coin (coin.id)}
+    <div class="flying-coin">
+      <div class="coin-container">
+        <img src="/assets/coin.svg" alt="Coin" class="coin-image" />
+        <span class="coin-points">+{coin.points}</span>
+      </div>
+    </div>
+  {/each}
   
   <!-- Notification system -->
   <Notification 

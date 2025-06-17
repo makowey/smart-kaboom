@@ -71,7 +71,9 @@ export function createGameState() {
       multiplier: 1,
       flippedTiles: new Set(),
       canContinue: true,
-      allTilesFlipped: false
+      allTilesFlipped: false,
+      hasPassedTurn: false,
+      tilesFlippedThisTurn: 0
     },
     team2: {
       name: 'Lightning Wolves', 
@@ -80,10 +82,14 @@ export function createGameState() {
       multiplier: 1,
       flippedTiles: new Set(),
       canContinue: true,
-      allTilesFlipped: false
+      allTilesFlipped: false,
+      hasPassedTurn: false,
+      tilesFlippedThisTurn: 0
     },
     currentTeam: 'team1',
-    gameOver: false
+    gameOver: false,
+    winner: null,
+    consecutivePasses: 0
   };
 }
 
@@ -93,6 +99,7 @@ export function processTileFlip(gameState, team, row, col, tileData) {
   
   // Add to flipped tiles
   teamData.flippedTiles.add(tileId);
+  teamData.tilesFlippedThisTurn++;
   
   let message = '';
   let continuePlay = false;
@@ -147,15 +154,48 @@ export function processTileFlip(gameState, team, row, col, tileData) {
     teamData.allTilesFlipped = true;
   }
   
-  // Game over if both teams can't continue OR both teams have all tiles flipped
-  if ((!teamData.canContinue && !gameState[otherTeam].canContinue) ||
-      (teamData.allTilesFlipped && gameState[otherTeam].allTilesFlipped)) {
+  // Check for instant win condition (get win condition from global settings)
+  const winCondition = globalThis.gameSettings?.winCondition || 501;
+  if (teamData.score >= winCondition) {
+    gameState.gameOver = true;
+    gameState.winner = team;
+    return { message: `${message} 🏆 WINNER! Reached ${winCondition}+ points!`, continuePlay };
+  }
+  
+  // Game over if both teams are done (can't continue, passed permanently, or finished all tiles)
+  const team1Done = !gameState.team1.canContinue || gameState.team1.hasPassedTurn || gameState.team1.allTilesFlipped;
+  const team2Done = !gameState.team2.canContinue || gameState.team2.hasPassedTurn || gameState.team2.allTilesFlipped;
+  
+  if (team1Done && team2Done) {
     gameState.gameOver = true;
   }
   
-  // Switch teams if not continuing
-  if (!continuePlay && teamData.canContinue) {
-    gameState.currentTeam = otherTeam;
+  // Reset consecutive passes when a tile is flipped
+  gameState.consecutivePasses = 0;
+  
+  // Handle team switching or game ending
+  if (!continuePlay) {
+    if (teamData.canContinue) {
+      // Current team can continue, check if other team can play
+      if (!gameState[otherTeam].hasPassedTurn && !gameState[otherTeam].allTilesFlipped && gameState[otherTeam].canContinue) {
+        // Switch to other team
+        gameState[otherTeam].tilesFlippedThisTurn = 0;
+        gameState.currentTeam = otherTeam;
+      } else {
+        // Other team can't play, current team continues (they're the only active team)
+        teamData.tilesFlippedThisTurn = 0;
+      }
+    } else {
+      // Current team can't continue (lost all lives), switch to other team if possible
+      if (!gameState[otherTeam].hasPassedTurn && !gameState[otherTeam].allTilesFlipped && gameState[otherTeam].canContinue) {
+        // Switch to other team
+        gameState[otherTeam].tilesFlippedThisTurn = 0;
+        gameState.currentTeam = otherTeam;
+      } else {
+        // Neither team can continue, end the game
+        gameState.gameOver = true;
+      }
+    }
   }
   
   return { message, continuePlay };

@@ -9,20 +9,42 @@
   export let lives = 3;
   export let multiplier = 1;
   export let isActive = false;
+  export let hasPassedTurn = false;
+  export let canContinue = true;
+  export let allTilesFlipped = false;
 
   let board = createBoard();
+
+  export let teamId; // Add teamId prop to identify which team this board belongs to
 
   function handleTileFlip(row, col) {
     const tileId = `${row}-${col}`;
     if (!flippedTiles.has(tileId) && onTileFlip) {
-      onTileFlip(teamName === 'Thunder Hawks' ? 'team1' : 'team2', row, col, board[row][col]);
+      onTileFlip(teamId, row, col, board[row][col]);
     }
   }
 </script>
 
-<div class="game-board p-6 rounded-2xl shadow-2xl backdrop-blur-sm transition-all duration-300 {teamName === 'Thunder Hawks' ? 'bg-orange-400 bg-opacity-20 border-4 border-orange-500' : 'bg-purple-400 bg-opacity-20 border-4 border-purple-500'} {isActive ? 'glow-active' : 'inactive-board'}">
+<div class="game-board p-6 rounded-2xl shadow-2xl backdrop-blur-sm transition-all duration-300 {teamId === 'team1' ? 'bg-orange-400 bg-opacity-20 border-4 border-orange-500' : 'bg-purple-400 bg-opacity-20 border-4 border-purple-500'} {isActive ? 'glow-active' : 'inactive-board'}">
   <div class="text-center mb-4">
-    <h2 class="text-3xl font-bold mb-3 text-white drop-shadow-lg" style="font-family: 'Alfa Slab One', cursive; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">{teamName}</h2>
+    <div class="flex items-center justify-center gap-4 mb-3">
+      <h2 class="text-3xl font-bold text-white drop-shadow-lg" style="font-family: 'Alfa Slab One', cursive; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">{teamName}</h2>
+      {#if hasPassedTurn}
+        <div class="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold font-comic shadow-lg border-2 border-white animate-pulse">
+          <i class="fas fa-flag mr-1"></i>PASSED
+        </div>
+      {/if}
+      {#if !canContinue && !hasPassedTurn}
+        <div class="bg-gray-600 text-white px-3 py-1 rounded-full text-sm font-bold font-comic shadow-lg border-2 border-white">
+          <i class="fas fa-skull mr-1"></i>OUT
+        </div>
+      {/if}
+      {#if allTilesFlipped && !hasPassedTurn && canContinue}
+        <div class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold font-comic shadow-lg border-2 border-white">
+          <i class="fas fa-check mr-1"></i>DONE
+        </div>
+      {/if}
+    </div>
     <div class="flex justify-center items-center gap-6 text-lg">
       <div class="flex items-center bg-white bg-opacity-20 px-3 py-2 rounded-full backdrop-blur-sm">
         <i class="fas fa-coins mr-2 text-yellow-400 text-xl drop-shadow-md"></i>
