@@ -22,7 +22,7 @@
       case 'bomb': return 'bg-gradient-to-br from-red-500 to-red-700 border-red-800';
       case 'life': return 'bg-gradient-to-br from-pink-500 to-pink-700 border-pink-800';
       case 'multiplier': return 'bg-gradient-to-br from-purple-500 to-purple-700 border-purple-800';
-      case 'try_again': return 'bg-gradient-to-br from-blue-500 to-blue-700 border-blue-800';
+      case 'try_again': return 'bg-gradient-to-br from-yellow-400 to-yellow-600 border-yellow-700';
       default: return 'bg-gradient-to-br from-gray-500 to-gray-700 border-gray-800';
     }
   }
@@ -55,8 +55,10 @@
           <span class="absolute text-white font-bold font-comic" style="color: white !important; font-size: 36px; text-shadow: 0 2px 4px rgba(0,0,0,0.9);">{tileData.value}</span>
         </div>
       {:else if tileData.type === 'bomb'}
-        <i class="fas fa-bomb text-3xl drop-shadow-lg" style="color: #e5e7eb !important;"></i>
-        <span class="font-bold text-xs font-comic mt-1" style="color: #e5e7eb !important;">BOMB!</span>
+        <div class="flex flex-col items-center justify-center h-full">
+          <img src="/assets/bomb.svg" alt="Bomb" class="w-4 h-4 drop-shadow-lg bomb-reveal" style="max-width: 16px; max-height: 16px;" />
+          <span class="font-bold text-xs font-comic mt-1" style="color: #e5e7eb !important;">BOMB!</span>
+        </div>
       {:else if tileData.type === 'life'}
         <i class="fas fa-heart text-3xl drop-shadow-lg animate-pulse" style="color: #e5e7eb !important;"></i>
         <span class="font-bold text-xs font-comic mt-1" style="color: #e5e7eb !important;">+LIFE</span>
@@ -130,6 +132,31 @@
     100% { 
       transform: rotate(1800deg) scale(1.1);
       filter: brightness(1.3);
+    }
+  }
+  
+  .bomb-reveal {
+    animation: bomb-grow 2s ease-out;
+  }
+  
+  @keyframes bomb-grow {
+    0% { 
+      max-width: 40px;
+      max-height: 40px;
+      transform: scale(2.5);
+      filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.8));
+    }
+    50% { 
+      max-width: 32px;
+      max-height: 32px;
+      transform: scale(2);
+      filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.6));
+    }
+    100% { 
+      max-width: 16px;
+      max-height: 16px;
+      transform: scale(1);
+      filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
     }
   }
 </style>

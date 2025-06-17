@@ -22,20 +22,21 @@
 
 <div class="game-board p-4 bg-white bg-opacity-90 rounded-xl shadow-2xl backdrop-blur-sm transition-all duration-300 {isActive ? 'border-4 border-yellow-400 shadow-yellow-400/50 glow-active' : 'border-4 border-transparent'}">
   <div class="text-center mb-4">
-    <h2 class="text-2xl font-bold mb-2 {teamName === 'Thunder Hawks' ? 'text-orange-600' : 'text-purple-600'}" style="font-family: 'Alfa Slab One', cursive;">{teamName}</h2>
-    <div class="flex justify-center items-center gap-4 text-sm">
-      <div class="flex items-center">
-        <i class="fas fa-coins mr-1 text-yellow-600"></i>
-        <span class="font-bold font-comic {teamName === 'Thunder Hawks' ? 'text-orange-600' : 'text-purple-600'}">{score}</span>
+    <h2 class="text-3xl font-bold mb-3 text-white drop-shadow-lg" style="font-family: 'Alfa Slab One', cursive; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">{teamName}</h2>
+    <div class="flex justify-center items-center gap-6 text-lg">
+      <div class="flex items-center bg-white bg-opacity-20 px-3 py-2 rounded-full backdrop-blur-sm">
+        <i class="fas fa-coins mr-2 text-yellow-400 text-xl drop-shadow-md"></i>
+        <span class="font-bold font-comic text-white drop-shadow-md">{score}</span>
       </div>
-      <div class="flex items-center">
-        <i class="fas fa-heart mr-1 text-red-500"></i>
-        <span class="font-bold font-comic {teamName === 'Thunder Hawks' ? 'text-orange-600' : 'text-purple-600'}">{lives}</span>
+      <div class="flex items-center bg-white bg-opacity-20 px-3 py-2 rounded-full backdrop-blur-sm">
+        {#each Array(4) as _, i}
+          <i class="fas fa-heart text-lg {i < lives ? 'text-red-400' : 'text-gray-400 opacity-30'} drop-shadow-md {i > 0 ? 'ml-1' : ''}"></i>
+        {/each}
       </div>
       {#if multiplier > 1}
-        <div class="flex items-center">
-          <i class="fas fa-star mr-1 text-purple-600"></i>
-          <span class="font-bold font-comic {teamName === 'Thunder Hawks' ? 'text-orange-600' : 'text-purple-600'}">x{multiplier}</span>
+        <div class="flex items-center bg-purple-500 bg-opacity-30 px-3 py-2 rounded-full backdrop-blur-sm animate-pulse">
+          <i class="fas fa-star mr-2 text-yellow-300 text-xl drop-shadow-md animate-spin-slow"></i>
+          <span class="font-bold font-comic text-white drop-shadow-md">x{multiplier}</span>
         </div>
       {/if}
     </div>

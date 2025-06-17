@@ -96,12 +96,15 @@ export function processTileFlip(gameState, team, row, col, tileData) {
       break;
       
     case 'bomb':
-      teamData.score = 0; // Lose all current points
       teamData.lives--;
-      message = 'Bomb! Lost all points and a life!';
-      if (teamData.lives <= 0) {
+      if (teamData.lives < 0) {
+        // No lives left - lose all points
+        teamData.score = 0;
         teamData.canContinue = false;
-        message += ' Game Over!';
+        message = 'Bomb! No lives left - lost all points! Game Over!';
+      } else {
+        // Still have lives - only lose the life
+        message = 'Bomb! Lost a life!';
       }
       break;
       
@@ -112,16 +115,15 @@ export function processTileFlip(gameState, team, row, col, tileData) {
       break;
       
     case 'multiplier':
-      teamData.multiplier = 2;
-      message = 'Next points will be doubled!';
+      teamData.score *= 2; // Double all current points
+      message = `All points doubled! Now ${teamData.score} points!`;
       continuePlay = true;
       break;
       
     case 'try_again':
-      const tryAgainPoints = tileData.value * teamData.multiplier;
+      const tryAgainPoints = tileData.value;
       teamData.score += tryAgainPoints;
       message = `+${tryAgainPoints} point! Try one more time!`;
-      teamData.multiplier = 1; // Reset multiplier after use
       continuePlay = true;
       break;
       

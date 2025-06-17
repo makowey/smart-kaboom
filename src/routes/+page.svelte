@@ -10,6 +10,7 @@
     type: 'info'
   };
   let notificationTimeout;
+  let currentMessage = '';
 
   function handleTileFlip(team, row, col, tileData) {
     if (gameState.currentTeam !== team || gameState.gameOver) return;
@@ -17,32 +18,22 @@
     const previousTeam = gameState.currentTeam;
     const result = processTileFlip(gameState, team, row, col, tileData);
     
-    // Show tile result notification
-    notification = {
-      show: true,
-      message: `${gameState[team].name}: ${result.message}`,
-      type: tileData.type
-    };
+    // Show tile result message
+    currentMessage = `${gameState[team].name}: ${result.message}`;
     
-    // Clear notification after 3 seconds, then show team change if needed
+    // Clear message after 3 seconds, then show team change if needed
     clearTimeout(notificationTimeout);
     notificationTimeout = setTimeout(() => {
-      notification.show = false;
-      
-      // If team changed and game is not over, show team change notification
+      // If team changed and game is not over, show team change
       if (gameState.currentTeam !== previousTeam && !gameState.gameOver && !result.continuePlay) {
+        currentMessage = `${gameState[gameState.currentTeam].name}'s Turn!`;
+        
+        // Clear team change message after 2 seconds
         setTimeout(() => {
-          notification = {
-            show: true,
-            message: `${gameState[gameState.currentTeam].name}'s Turn!`,
-            type: 'info'
-          };
-          
-          // Clear team change notification after 2 seconds
-          setTimeout(() => {
-            notification.show = false;
-          }, 2000);
-        }, 500);
+          currentMessage = '';
+        }, 2000);
+      } else {
+        currentMessage = '';
       }
     }, 3000);
     
@@ -53,6 +44,7 @@
   function resetGame() {
     gameState = createGameState();
     notification.show = false;
+    currentMessage = '';
   }
 
   $: currentTeamName = gameState[gameState.currentTeam]?.name || '';
@@ -148,6 +140,13 @@
       </div>
     </div>
   </div>
+  
+  <!-- Fixed message display -->
+  {#if currentMessage}
+    <div class="fixed top-4 right-4 bg-white px-4 py-3 rounded-lg shadow-xl border-2 border-gray-300 max-w-sm" style="z-index: 10000;">
+      <p class="text-gray-800 font-bold font-comic text-sm">{currentMessage}</p>
+    </div>
+  {/if}
   
   <!-- Notification system -->
   <Notification 

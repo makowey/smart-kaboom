@@ -20,7 +20,7 @@
       case 'points':
         return 'bg-green-500 border-green-600';
       case 'try_again':
-        return 'bg-blue-500 border-blue-600';
+        return 'bg-yellow-500 border-yellow-600';
       default:
         return 'bg-blue-500 border-blue-600';
     }
