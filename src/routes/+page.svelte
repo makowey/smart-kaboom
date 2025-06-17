@@ -47,6 +47,35 @@
     currentMessage = '';
   }
 
+  function passTurn() {
+    if (gameState.gameOver) return;
+    
+    const currentTeamData = gameState[gameState.currentTeam];
+    const otherTeam = gameState.currentTeam === 'team1' ? 'team2' : 'team1';
+    const otherTeamData = gameState[otherTeam];
+    
+    currentMessage = `${currentTeamData.name} passed their turn!`;
+    
+    // Check if the other team has all tiles flipped
+    if (otherTeamData.allTilesFlipped) {
+      // If the other team already flipped all tiles and current team passes, game ends
+      gameState.gameOver = true;
+      currentMessage = `${currentTeamData.name} passed! Game Over!`;
+    } else {
+      // Switch to other team
+      gameState.currentTeam = otherTeam;
+    }
+    
+    // Clear message after 2 seconds
+    clearTimeout(notificationTimeout);
+    notificationTimeout = setTimeout(() => {
+      currentMessage = '';
+    }, 2000);
+    
+    // Trigger reactivity
+    gameState = gameState;
+  }
+
   $: currentTeamName = gameState[gameState.currentTeam]?.name || '';
 </script>
 
@@ -89,6 +118,12 @@
     {#if !gameState.gameOver}
       <div class="text-center mb-6">
         <p class="text-xl font-semibold text-white drop-shadow font-comic">Current Turn: <span class="font-bold text-white">{currentTeamName}</span></p>
+        <button 
+          class="mt-4 px-8 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 font-comic border-2 border-yellow-400"
+          on:click={passTurn}
+        >
+          <i class="fas fa-hand-paper mr-2 text-lg"></i>Pass Turn
+        </button>
       </div>
     {:else}
       <div class="text-center mb-6">
@@ -140,6 +175,61 @@
     </div>
   </div>
   
+  <!-- Game Legend -->
+  <div class="fixed top-4 left-4 bg-white bg-opacity-95 p-4 rounded-xl shadow-xl border-2 border-gray-300 max-w-xs backdrop-blur-sm" style="z-index: 10000;">
+    <h3 class="text-lg font-bold text-gray-800 font-alfa mb-3 text-center">Game Legend</h3>
+    
+    <div class="space-y-2 text-sm">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <img src="/assets/coin.svg" alt="Points" class="w-4 h-4 mr-2" />
+          <span class="font-comic text-gray-700">Points</span>
+        </div>
+        <span class="text-xs text-gray-600">5-100 pts</span>
+      </div>
+      
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <img src="/assets/bomb.svg" alt="Bomb" class="w-4 h-4 mr-2" />
+          <span class="font-comic text-gray-700">Bomb</span>
+        </div>
+        <span class="text-xs text-gray-600">-1 life</span>
+      </div>
+      
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <i class="fas fa-heart text-red-500 text-sm mr-2"></i>
+          <span class="font-comic text-gray-700">Life</span>
+        </div>
+        <span class="text-xs text-gray-600">+1 life</span>
+      </div>
+      
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <i class="fas fa-star text-yellow-500 text-sm mr-2"></i>
+          <span class="font-comic text-gray-700">Multiplier</span>
+        </div>
+        <span class="text-xs text-gray-600">x2 all pts</span>
+      </div>
+      
+      <div class="flex items-center justify-between bg-yellow-100 px-2 py-1 rounded">
+        <div class="flex items-center">
+          <img src="/assets/coin.svg" alt="Try Again" class="w-4 h-4 mr-2" />
+          <span class="font-comic text-gray-700">Try Again</span>
+        </div>
+        <span class="text-xs text-gray-600">+2 pts</span>
+      </div>
+    </div>
+    
+    <div class="mt-3 pt-3 border-t border-gray-300">
+      <div class="text-xs text-gray-600 space-y-1">
+        <div>• 4 Bombs, 3 Lives, 2 Multipliers</div>
+        <div>• 22 Try Again tiles</div>
+        <div>• No lives + Bomb = Lose all points</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Fixed message display -->
   {#if currentMessage}
     <div class="fixed top-4 right-4 bg-white px-4 py-3 rounded-lg shadow-xl border-2 border-gray-300 max-w-sm" style="z-index: 10000;">
