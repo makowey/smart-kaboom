@@ -162,6 +162,14 @@ export function processTileFlip(gameState, team, row, col, tileData) {
     return { message: `${message} 🏆 WINNER! Reached ${winCondition}+ points!`, continuePlay };
   }
   
+  // Check if this team has surpassed a passed team's score (instant win)
+  const otherTeamData = gameState[otherTeam];
+  if (otherTeamData.hasPassedTurn && teamData.score > otherTeamData.score) {
+    gameState.gameOver = true;
+    gameState.winner = team;
+    return { message: `${message} 🏆 WINNER! Surpassed passed team's score!`, continuePlay };
+  }
+  
   // Game over if both teams are done (can't continue, passed permanently, or finished all tiles)
   const team1Done = !gameState.team1.canContinue || gameState.team1.hasPassedTurn || gameState.team1.allTilesFlipped;
   const team2Done = !gameState.team2.canContinue || gameState.team2.hasPassedTurn || gameState.team2.allTilesFlipped;
