@@ -764,6 +764,21 @@
     background: linear-gradient(145deg, rgba(255, 165, 0, 1), rgba(255, 140, 0, 0.9));
   }
   
+  .icon-pass-button:not(:disabled) {
+    animation: pulse-pass-button 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-pass-button {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.7);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 10px rgba(255, 165, 0, 0);
+    }
+  }
+  
   .icon-help-button {
     background: linear-gradient(145deg, rgba(99, 102, 241, 0.9), rgba(79, 70, 229, 0.8));
   }
