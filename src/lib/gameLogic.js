@@ -73,7 +73,9 @@ export function createGameState() {
       canContinue: true,
       allTilesFlipped: false,
       hasPassedTurn: false,
-      tilesFlippedThisTurn: 0
+      tilesFlippedThisTurn: 0,
+      scoreAtTurnStart: 0,
+      pendingPoints: []
     },
     team2: {
       name: 'Lightning Wolves', 
@@ -84,7 +86,9 @@ export function createGameState() {
       canContinue: true,
       allTilesFlipped: false,
       hasPassedTurn: false,
-      tilesFlippedThisTurn: 0
+      tilesFlippedThisTurn: 0,
+      scoreAtTurnStart: 0,
+      pendingPoints: []
     },
     currentTeam: 'team1',
     gameOver: false,
@@ -120,8 +124,15 @@ export function processTileFlip(gameState, team, row, col, tileData) {
         teamData.canContinue = false;
         message = 'Bomb! No lives left - lost all points! Game Over!';
       } else {
-        // Still have lives - only lose the life
-        message = 'Bomb! Lost a life!';
+        // Still have lives - lose all points gained this turn
+        const pointsLost = teamData.score - teamData.scoreAtTurnStart;
+        teamData.score = teamData.scoreAtTurnStart;
+        teamData.pendingPoints = []; // Clear any pending points
+        if (pointsLost > 0) {
+          message = `Bomb! Lost a life and ${pointsLost} points from this turn!`;
+        } else {
+          message = 'Bomb! Lost a life!';
+        }
       }
       break;
       
@@ -214,16 +225,22 @@ export function processTileFlip(gameState, team, row, col, tileData) {
       if (!gameState[otherTeam].hasPassedTurn && !gameState[otherTeam].allTilesFlipped && gameState[otherTeam].canContinue) {
         // Switch to other team
         gameState[otherTeam].tilesFlippedThisTurn = 0;
+        gameState[otherTeam].scoreAtTurnStart = gameState[otherTeam].score;
+        gameState[otherTeam].pendingPoints = [];
         gameState.currentTeam = otherTeam;
       } else {
         // Other team can't play, current team continues (they're the only active team)
         teamData.tilesFlippedThisTurn = 0;
+        teamData.scoreAtTurnStart = teamData.score;
+        teamData.pendingPoints = [];
       }
     } else {
       // Current team can't continue (lost all lives), switch to other team if possible
       if (!gameState[otherTeam].hasPassedTurn && !gameState[otherTeam].allTilesFlipped && gameState[otherTeam].canContinue) {
         // Switch to other team
         gameState[otherTeam].tilesFlippedThisTurn = 0;
+        gameState[otherTeam].scoreAtTurnStart = gameState[otherTeam].score;
+        gameState[otherTeam].pendingPoints = [];
         gameState.currentTeam = otherTeam;
       } else {
         // Neither team can continue, end the game

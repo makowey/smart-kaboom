@@ -178,16 +178,29 @@
       // Revert the score change temporarily
       gameState[team].score = originalScore;
       
+      // Track pending points for bomb handling
+      gameState[team].pendingPoints.push(actualPoints);
+      
       // Create flying coin with callback to add points when animation completes
       createFlyingCoin(actualPoints, gameState[team].name, tilePosition, () => {
-        gameState[team].score += actualPoints;
+        // Only add points if they're still pending (not lost to bomb)
+        if (gameState[team].pendingPoints.includes(actualPoints)) {
+          gameState[team].score += actualPoints;
+          gameState[team].pendingPoints = gameState[team].pendingPoints.filter(p => p !== actualPoints);
+        }
         if (tileData.type === 'points') {
           gameState[team].multiplier = 1; // Reset multiplier after use
         }
         gameState = gameState; // Trigger reactivity
       });
+    } else if (tileData.type === 'bomb') {
+      // For bombs, process immediately and cancel any pending points
+      result = processTileFlip(gameState, team, row, col, tileData);
+      
+      // Cancel all pending points animations won't add points when they complete
+      gameState[team].pendingPoints = [];
     } else {
-      // For non-point tiles, process normally
+      // For other non-point tiles, process normally
       result = processTileFlip(gameState, team, row, col, tileData);
       
       // Create flying heart effect for life gained (only if actually gained)
@@ -224,6 +237,10 @@
     // Apply current settings to new game
     gameState.team1.name = settings.team1Name;
     gameState.team2.name = settings.team2Name;
+    
+    // Initialize turn tracking for first team
+    gameState[gameState.currentTeam].scoreAtTurnStart = 0;
+    gameState[gameState.currentTeam].pendingPoints = [];
     
     // Ensure global settings are set for new game
     globalThis.gameSettings = { 
@@ -284,8 +301,10 @@
       
       // Switch turns only if game isn't over
       if (!gameState.gameOver) {
-        // Reset tiles flipped counter for next team's turn
+        // Reset tiles flipped counter and turn tracking for next team's turn
         gameState[nextTeam].tilesFlippedThisTurn = 0;
+        gameState[nextTeam].scoreAtTurnStart = gameState[nextTeam].score;
+        gameState[nextTeam].pendingPoints = [];
         gameState.currentTeam = nextTeam;
       }
     }
