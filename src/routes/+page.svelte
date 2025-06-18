@@ -851,7 +851,7 @@
     
     <!-- Always visible button row -->
     <div class="text-center mb-6">
-      <div class="flex gap-8 justify-center mb-4 flex-wrap">
+      <div class="flex justify-center mb-4 flex-wrap" style="gap: 2rem;">
         {#if !gameState.gameOver}
           <button 
             class="icon-button icon-pass-button"
