@@ -31,7 +31,9 @@
       "Bash(git reset:*)",
       "Bash(git restore:*)",
       "Bash(git tag:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(gh repo view:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": []
   }
