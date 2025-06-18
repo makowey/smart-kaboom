@@ -370,12 +370,20 @@
     z-index: 60000;
   }
   
-  .fly-to-team1 {
-    animation: coin-fly-team1 2s ease-out forwards;
+  .coin-fly-to-team1 {
+    animation: coin-fly-team1-score 2s ease-out forwards;
   }
   
-  .fly-to-team2 {
-    animation: coin-fly-team2 2s ease-out forwards;
+  .coin-fly-to-team2 {
+    animation: coin-fly-team2-score 2s ease-out forwards;
+  }
+  
+  .heart-fly-to-team1 {
+    animation: heart-fly-team1-lives 2s ease-out forwards;
+  }
+  
+  .heart-fly-to-team2 {
+    animation: heart-fly-team2-lives 2s ease-out forwards;
   }
   
   .coin-container {
@@ -430,7 +438,7 @@
     animation: fade-scale 2s ease-out forwards;
   }
   
-  @keyframes coin-fly-team1 {
+  @keyframes coin-fly-team1-score {
     0% {
       transform: translate(-50%, -50%) scale(0.5);
       opacity: 0;
@@ -449,7 +457,7 @@
     }
   }
   
-  @keyframes coin-fly-team2 {
+  @keyframes coin-fly-team2-score {
     0% {
       transform: translate(-50%, -50%) scale(0.5);
       opacity: 0;
@@ -464,6 +472,44 @@
     }
     100% {
       transform: translate(300%, -250%) scale(0.3);
+      opacity: 0;
+    }
+  }
+  
+  @keyframes heart-fly-team1-lives {
+    0% {
+      transform: translate(-50%, -50%) scale(0.5);
+      opacity: 0;
+    }
+    20% {
+      transform: translate(-50%, -60%) scale(1.2);
+      opacity: 1;
+    }
+    60% {
+      transform: translate(200%, -200%) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(300%, -250%) scale(0.3);
+      opacity: 0;
+    }
+  }
+  
+  @keyframes heart-fly-team2-lives {
+    0% {
+      transform: translate(-50%, -50%) scale(0.5);
+      opacity: 0;
+    }
+    20% {
+      transform: translate(-50%, -60%) scale(1.2);
+      opacity: 1;
+    }
+    60% {
+      transform: translate(-200%, -200%) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-300%, -250%) scale(0.3);
       opacity: 0;
     }
   }
@@ -1120,7 +1166,7 @@
   
   <!-- Flying Coins Animation -->
   {#each flyingCoins as coin (coin.id)}
-    <div class="flying-coin {coin.isTeam1 ? 'fly-to-team1' : 'fly-to-team2'}" style="left: {coin.startX}; top: {coin.startY};">
+    <div class="flying-coin {coin.isTeam1 ? 'coin-fly-to-team1' : 'coin-fly-to-team2'}" style="left: {coin.startX}; top: {coin.startY};">
       <div class="coin-container">
         <img src="/assets/coin.svg" alt="Coin" class="coin-image" />
         <span class="coin-points">+{coin.points}</span>
@@ -1130,7 +1176,7 @@
   
   <!-- Flying Hearts Animation -->
   {#each flyingHearts as heart (heart.id)}
-    <div class="flying-heart {heart.isTeam1 ? 'fly-to-team1' : 'fly-to-team2'}" style="left: {heart.startX}; top: {heart.startY};">
+    <div class="flying-heart {heart.isTeam1 ? 'heart-fly-to-team1' : 'heart-fly-to-team2'}" style="left: {heart.startX}; top: {heart.startY};">
       <div class="heart-container">
         <i class="fas fa-heart heart-icon"></i>
         <span class="heart-text">+1 LIFE</span>
