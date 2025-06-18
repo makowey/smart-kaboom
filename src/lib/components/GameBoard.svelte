@@ -45,25 +45,25 @@
         </div>
       {/if}
     </div>
-    <div class="flex flex-col lg:flex-row justify-center items-center gap-32 mb-12">
+    <div class="flex justify-center items-center gap-16 mb-8">
       <!-- Score Display -->
-      <div class="flex items-center justify-center min-w-[300px]" style="background: #FFFFFF; padding: 40px 60px; border-radius: 50px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border: 8px solid #CCCCCC;">
-        <img src="/assets/coin.svg" alt="Coin" style="width: 80px; height: 80px; margin-right: 40px;" />
-        <span style="font-family: 'Alfa Slab One', cursive; font-size: 120px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">{score}</span>
+      <div class="flex items-center justify-center" style="background: #FFFFFF; padding: 20px 30px; border-radius: 25px; box-shadow: 0 15px 30px rgba(0,0,0,0.4); border: 4px solid #CCCCCC;">
+        <img src="/assets/coin.svg" alt="Coin" style="width: 50px; height: 50px; margin-right: 20px;" />
+        <span style="font-family: 'Alfa Slab One', cursive; font-size: 72px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">{score}</span>
       </div>
 
       <!-- Lives Display -->
-      <div class="flex items-center justify-center min-w-[300px]" style="background: #FFFFFF; padding: 40px 50px; border-radius: 50px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border: 8px solid #CCCCCC;">
+      <div class="flex items-center justify-center" style="background: #FFFFFF; padding: 20px 25px; border-radius: 25px; box-shadow: 0 15px 30px rgba(0,0,0,0.4); border: 4px solid #CCCCCC;">
         {#each Array(4) as _, i}
-          <i class="fas fa-heart" style="font-size: 80px; color: {i < lives ? '#DC2626' : '#9CA3AF'}; margin-left: {i > 0 ? '30px' : '0'};"></i>
+          <i class="fas fa-heart" style="font-size: 50px; color: {i < lives ? '#DC2626' : '#9CA3AF'}; margin-left: {i > 0 ? '15px' : '0'};"></i>
         {/each}
       </div>
 
       <!-- Multiplier Display -->
       {#if multiplier > 1}
-        <div class="flex items-center justify-center min-w-[300px]" style="background: #FFFFFF; padding: 40px 60px; border-radius: 50px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border: 8px solid #FCD34D;">
-          <i class="fas fa-star" style="font-size: 100px; color: #D97706; margin-right: 40px;"></i>
-          <span style="font-family: 'Alfa Slab One', cursive; font-size: 120px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">x{multiplier}</span>
+        <div class="flex items-center justify-center" style="background: #FFFFFF; padding: 20px 30px; border-radius: 25px; box-shadow: 0 15px 30px rgba(0,0,0,0.4); border: 4px solid #FCD34D;">
+          <i class="fas fa-star" style="font-size: 60px; color: #D97706; margin-right: 20px;"></i>
+          <span style="font-family: 'Alfa Slab One', cursive; font-size: 72px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">x{multiplier}</span>
         </div>
       {/if}
     </div>
