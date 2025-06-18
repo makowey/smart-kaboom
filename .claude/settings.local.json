@@ -26,7 +26,11 @@
       "Bash(rustc:*)",
       "Bash(source:*)",
       "Bash(npm run tauri:build:*)",
-      "Bash(rustup target:*)"
+      "Bash(rustup target:*)",
+      "Bash(git rm:*)",
+      "Bash(git reset:*)",
+      "Bash(git restore:*)",
+      "Bash(git tag:*)"
     ],
     "deny": []
   }

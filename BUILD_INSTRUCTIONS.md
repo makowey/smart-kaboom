@@ -39,6 +39,8 @@ npm run tauri:dev
 npm run tauri:build
 ```
 
+**Note**: The build system automatically detects desktop vs web builds using the `TAURI_BUILD` environment variable.
+
 #### For Windows (requires Windows machine):
 ```bash
 # On Windows machine with Visual Studio Build Tools installed:

@@ -1,5 +1,9 @@
-import adapter from '@sveltejs/adapter-static';
+import adapterStatic from '@sveltejs/adapter-static';
+import adapterVercel from '@sveltejs/adapter-vercel';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+
+// Use static adapter for Tauri builds, Vercel adapter for web deployment
+const isDesktopBuild = process.env.TAURI_BUILD === 'true';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -8,14 +12,15 @@ const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
-		// Use static adapter for Tauri desktop app
-		adapter: adapter({
-			pages: 'build',
-			assets: 'build',
-			fallback: 'index.html',
-			precompress: false,
-			strict: false
-		})
+		adapter: isDesktopBuild 
+			? adapterStatic({
+				pages: 'build',
+				assets: 'build',
+				fallback: 'index.html',
+				precompress: false,
+				strict: false
+			})
+			: adapterVercel()
 	}
 };
 
