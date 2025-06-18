@@ -48,7 +48,7 @@
     <div class="flex justify-center items-center gap-8 text-xl">
       <div class="flex items-center bg-white bg-opacity-20 px-8 py-6 rounded-full backdrop-blur-sm">
         <img src="/assets/coin.svg" alt="Coin" class="w-8 h-8 mr-6 drop-shadow-md" />
-        <span class="font-bold text-white drop-shadow-lg text-4xl font-comic">{score}</span>
+        <span class="font-bold text-white drop-shadow-lg text-4xl" style="font-family: 'Alfa Slab One', cursive;">{score}</span>
       </div>
       <div class="flex items-center bg-white bg-opacity-20 px-8 py-6 rounded-full backdrop-blur-sm">
         {#each Array(4) as _, i}
@@ -58,7 +58,7 @@
       {#if multiplier > 1}
         <div class="flex items-center bg-purple-500 bg-opacity-30 px-8 py-6 rounded-full backdrop-blur-sm animate-pulse">
           <i class="fas fa-star mr-6 text-yellow-300 text-3xl drop-shadow-md animate-spin-slow"></i>
-          <span class="font-bold text-white drop-shadow-lg text-4xl font-comic">x{multiplier}</span>
+          <span class="font-bold text-white drop-shadow-lg text-4xl" style="font-family: 'Alfa Slab One', cursive;">x{multiplier}</span>
         </div>
       {/if}
     </div>
