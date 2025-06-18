@@ -45,20 +45,34 @@
         </div>
       {/if}
     </div>
-    <div class="flex justify-center items-center gap-8 text-xl">
-      <div class="flex items-center bg-white bg-opacity-20 px-8 py-6 rounded-full backdrop-blur-sm">
-        <img src="/assets/coin.svg" alt="Coin" class="w-8 h-8 mr-6 drop-shadow-md" />
-        <span class="font-bold text-white drop-shadow-lg text-4xl" style="font-family: 'Alfa Slab One', cursive;">{score}</span>
+    <div class="flex justify-center items-center gap-12 text-xl mb-4">
+      <!-- Score Display -->
+      <div class="flex flex-col items-center">
+        <div class="flex items-center bg-white bg-opacity-20 px-10 py-6 rounded-2xl backdrop-blur-sm mb-2">
+          <img src="/assets/coin.svg" alt="Coin" class="w-10 h-10 mr-4 drop-shadow-md" />
+          <span class="font-bold text-white drop-shadow-lg text-5xl" style="font-family: 'Alfa Slab One', cursive;">{score}</span>
+        </div>
+        <span class="text-white font-comic text-sm opacity-80">POINTS</span>
       </div>
-      <div class="flex items-center bg-white bg-opacity-20 px-8 py-6 rounded-full backdrop-blur-sm">
-        {#each Array(4) as _, i}
-          <i class="fas fa-heart text-2xl {i < lives ? 'text-red-400' : 'text-gray-400 opacity-30'} drop-shadow-md {i > 0 ? 'ml-3' : ''}"></i>
-        {/each}
+
+      <!-- Lives Display -->
+      <div class="flex flex-col items-center">
+        <div class="flex items-center bg-white bg-opacity-20 px-8 py-6 rounded-2xl backdrop-blur-sm mb-2">
+          {#each Array(4) as _, i}
+            <i class="fas fa-heart text-3xl {i < lives ? 'text-red-400' : 'text-gray-400 opacity-30'} drop-shadow-md {i > 0 ? 'ml-4' : ''}"></i>
+          {/each}
+        </div>
+        <span class="text-white font-comic text-sm opacity-80">LIVES</span>
       </div>
+
+      <!-- Multiplier Display -->
       {#if multiplier > 1}
-        <div class="flex items-center bg-purple-500 bg-opacity-30 px-8 py-6 rounded-full backdrop-blur-sm animate-pulse">
-          <i class="fas fa-star mr-6 text-yellow-300 text-3xl drop-shadow-md animate-spin-slow"></i>
-          <span class="font-bold text-white drop-shadow-lg text-4xl" style="font-family: 'Alfa Slab One', cursive;">x{multiplier}</span>
+        <div class="flex flex-col items-center">
+          <div class="flex items-center bg-purple-500 bg-opacity-30 px-10 py-6 rounded-2xl backdrop-blur-sm animate-pulse mb-2">
+            <i class="fas fa-star mr-4 text-yellow-300 text-4xl drop-shadow-md animate-spin-slow"></i>
+            <span class="font-bold text-white drop-shadow-lg text-5xl" style="font-family: 'Alfa Slab One', cursive;">x{multiplier}</span>
+          </div>
+          <span class="text-white font-comic text-sm opacity-80">MULTIPLIER</span>
         </div>
       {/if}
     </div>
