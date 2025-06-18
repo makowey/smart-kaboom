@@ -1,7 +1,10 @@
 <script>
   import GameBoard from '$lib/components/GameBoard.svelte';
   import Notification from '$lib/components/Notification.svelte';
+  import UpdateModal from '$lib/components/UpdateModal.svelte';
   import { createGameState, processTileFlip } from '$lib/gameLogic.js';
+  import { checkForUpdates } from '$lib/services/versionCheck.js';
+  import { onMount } from 'svelte';
 
   let gameState = createGameState();
   let notification = {
@@ -13,6 +16,8 @@
   let currentMessage = '';
   let showLegend = false;
   let showSettings = false;
+  let showUpdateModal = false;
+  let updateInfo = null;
   let flyingCoins = [];
   let flyingHearts = [];
   let settings = {
@@ -60,6 +65,34 @@
     minTries: settings.minTries,
     maxTries: settings.maxTries
   };
+
+  // Check for updates on app startup
+  async function performUpdateCheck() {
+    try {
+      const result = await checkForUpdates();
+      
+      // Check if user has skipped this version
+      if (typeof localStorage !== 'undefined') {
+        const skippedVersion = localStorage.getItem('smartKaboom_skipVersion');
+        if (skippedVersion === result.latestVersion) {
+          return; // User has skipped this version
+        }
+      }
+      
+      if (result.hasUpdate && !result.error) {
+        updateInfo = result;
+        showUpdateModal = true;
+      }
+    } catch (error) {
+      console.warn('Update check failed:', error);
+    }
+  }
+
+  // Mount handler for initial setup
+  onMount(() => {
+    // Check for updates after a short delay to allow app to load
+    setTimeout(performUpdateCheck, 2000);
+  });
 
   function createFlyingCoin(points, teamName, tilePosition, onComplete = null) {
     const coinId = Date.now() + Math.random();
@@ -152,6 +185,10 @@
       minTries: 1,
       maxTries: 3
     };
+  }
+
+  function closeUpdateModal() {
+    showUpdateModal = false;
   }
 
   function handleTileFlip(team, row, col, tileData, event) {
@@ -1339,5 +1376,12 @@
     show={notification.show}
     message={notification.message}
     type={notification.type}
+  />
+  
+  <!-- Update Modal -->
+  <UpdateModal 
+    visible={showUpdateModal}
+    {updateInfo}
+    on:close={closeUpdateModal}
   />
 </div>
