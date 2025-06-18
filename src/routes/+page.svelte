@@ -168,8 +168,8 @@
       createFlyingCoin(actualPoints, gameState[team].name, tilePosition);
     }
     
-    // Create flying heart effect for life gained
-    if (tileData.type === 'life') {
+    // Create flying heart effect for life gained (only if actually gained)
+    if (tileData.type === 'life' && result.message.includes('Extra life gained!')) {
       createFlyingHeart(gameState[team].name, tilePosition);
     }
     

@@ -126,8 +126,12 @@ export function processTileFlip(gameState, team, row, col, tileData) {
       break;
       
     case 'life':
-      teamData.lives++;
-      message = 'Extra life gained!';
+      if (teamData.lives >= 4) {
+        message = 'Already at maximum lives (4)!';
+      } else {
+        teamData.lives++;
+        message = 'Extra life gained!';
+      }
       continuePlay = true;
       break;
       
