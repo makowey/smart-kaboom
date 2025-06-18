@@ -61,13 +61,24 @@
     maxTries: settings.maxTries
   };
 
-  function createFlyingCoin(points, teamName) {
+  function createFlyingCoin(points, teamName, startElement) {
     const coinId = Date.now() + Math.random();
+    
+    // Get the position of the clicked tile
+    let startX = '50%', startY = '50%';
+    if (startElement) {
+      const rect = startElement.getBoundingClientRect();
+      startX = rect.left + rect.width / 2 + 'px';
+      startY = rect.top + rect.height / 2 + 'px';
+    }
+    
     const coin = {
       id: coinId,
       points: points,
       team: teamName,
-      isTeam1: teamName === gameState.team1.name
+      isTeam1: teamName === gameState.team1.name,
+      startX: startX,
+      startY: startY
     };
     
     flyingCoins = [...flyingCoins, coin];
@@ -78,12 +89,23 @@
     }, 2000);
   }
 
-  function createFlyingHeart(teamName) {
+  function createFlyingHeart(teamName, startElement) {
     const heartId = Date.now() + Math.random();
+    
+    // Get the position of the clicked tile
+    let startX = '50%', startY = '50%';
+    if (startElement) {
+      const rect = startElement.getBoundingClientRect();
+      startX = rect.left + rect.width / 2 + 'px';
+      startY = rect.top + rect.height / 2 + 'px';
+    }
+    
     const heart = {
       id: heartId,
       team: teamName,
-      isTeam1: teamName === gameState.team1.name
+      isTeam1: teamName === gameState.team1.name,
+      startX: startX,
+      startY: startY
     };
     
     flyingHearts = [...flyingHearts, heart];
@@ -131,23 +153,26 @@
     };
   }
 
-  function handleTileFlip(team, row, col, tileData) {
+  function handleTileFlip(team, row, col, tileData, event) {
     if (gameState.currentTeam !== team || gameState.gameOver) return;
     
     const previousTeam = gameState.currentTeam;
     const result = processTileFlip(gameState, team, row, col, tileData);
+    
+    // Get the clicked tile element
+    const tileElement = event?.target?.closest('.tile') || event?.currentTarget;
     
     // Create flying coin effect for points
     if (tileData.type === 'points' || tileData.type === 'try_again') {
       const actualPoints = tileData.type === 'points' 
         ? tileData.value * gameState[team].multiplier 
         : tileData.value;
-      createFlyingCoin(actualPoints, gameState[team].name);
+      createFlyingCoin(actualPoints, gameState[team].name, tileElement);
     }
     
     // Create flying heart effect for life gained
     if (tileData.type === 'life') {
-      createFlyingHeart(gameState[team].name);
+      createFlyingHeart(gameState[team].name, tileElement);
     }
     
     // Show tile result message
@@ -342,8 +367,6 @@
   
   .flying-coin {
     position: fixed;
-    top: 50%;
-    left: 50%;
     transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 60000;
@@ -366,8 +389,6 @@
   
   .flying-heart {
     position: fixed;
-    top: 50%;
-    left: 50%;
     transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 60000;
@@ -1101,7 +1122,7 @@
   
   <!-- Flying Coins Animation -->
   {#each flyingCoins as coin (coin.id)}
-    <div class="flying-coin {coin.isTeam1 ? 'fly-to-team1' : 'fly-to-team2'}">
+    <div class="flying-coin {coin.isTeam1 ? 'fly-to-team1' : 'fly-to-team2'}" style="left: {coin.startX}; top: {coin.startY};">
       <div class="coin-container">
         <img src="/assets/coin.svg" alt="Coin" class="coin-image" />
         <span class="coin-points">+{coin.points}</span>
@@ -1111,7 +1132,7 @@
   
   <!-- Flying Hearts Animation -->
   {#each flyingHearts as heart (heart.id)}
-    <div class="flying-heart {heart.isTeam1 ? 'fly-to-team1' : 'fly-to-team2'}">
+    <div class="flying-heart {heart.isTeam1 ? 'fly-to-team1' : 'fly-to-team2'}" style="left: {heart.startX}; top: {heart.startY};">
       <div class="heart-container">
         <i class="fas fa-heart heart-icon"></i>
         <span class="heart-text">+1 LIFE</span>
