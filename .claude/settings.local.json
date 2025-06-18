@@ -33,7 +33,9 @@
       "Bash(git tag:*)",
       "Bash(grep:*)",
       "Bash(gh repo view:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(convert:*)",
+      "Bash(sips:*)"
     ],
     "deny": []
   }

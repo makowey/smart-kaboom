@@ -371,6 +371,27 @@
 </script>
 
 <style>
+  /* Custom cursors - 15px size */
+  * {
+    cursor: url('/assets/cursor-small.png') 0 0, auto !important;
+  }
+  
+  /* Pointer cursor for interactive elements */
+  button, 
+  a, 
+  .cursor-pointer,
+  [role="button"],
+  input,
+  select,
+  textarea {
+    cursor: url('/assets/hand-small.png') 7 7, pointer !important;
+  }
+  
+  /* Override for specific interactive elements to ensure hand cursor */
+  .tile.cursor-pointer:hover {
+    cursor: url('/assets/hand-small.png') 7 7, pointer !important;
+  }
+  
   /* Fallback styles if Tailwind doesn't load */
   .fallback-container {
     min-height: 100vh;
