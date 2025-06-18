@@ -376,7 +376,7 @@
     cursor: url('/assets/cursor-medium.png') 0 0, auto !important;
   }
   
-  /* Pointer cursor for interactive elements */
+  /* Pointer cursor for interactive elements - try different hand cursor */
   button, 
   a, 
   .cursor-pointer,
@@ -384,12 +384,12 @@
   input,
   select,
   textarea {
-    cursor: url('/assets/hand-small.png') 7 7, pointer !important;
+    cursor: url('/assets/hand-20px.png') 10 10, pointer !important;
   }
   
   /* Override for specific interactive elements to ensure hand cursor */
   .tile.cursor-pointer:hover {
-    cursor: url('/assets/hand-small.png') 7 7, pointer !important;
+    cursor: url('/assets/hand-20px.png') 10 10, pointer !important;
   }
   
   /* Fallback styles if Tailwind doesn't load */
