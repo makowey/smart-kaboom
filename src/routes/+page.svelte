@@ -14,6 +14,7 @@
   let showLegend = false;
   let showSettings = false;
   let flyingCoins = [];
+  let flyingHearts = [];
   let settings = {
     team1Name: 'Thunder Hawks',
     team2Name: 'Lightning Wolves',
@@ -65,7 +66,8 @@
     const coin = {
       id: coinId,
       points: points,
-      team: teamName
+      team: teamName,
+      isTeam1: teamName === gameState.team1.name
     };
     
     flyingCoins = [...flyingCoins, coin];
@@ -73,6 +75,22 @@
     // Remove coin after animation completes
     setTimeout(() => {
       flyingCoins = flyingCoins.filter(c => c.id !== coinId);
+    }, 2000);
+  }
+
+  function createFlyingHeart(teamName) {
+    const heartId = Date.now() + Math.random();
+    const heart = {
+      id: heartId,
+      team: teamName,
+      isTeam1: teamName === gameState.team1.name
+    };
+    
+    flyingHearts = [...flyingHearts, heart];
+    
+    // Remove heart after animation completes
+    setTimeout(() => {
+      flyingHearts = flyingHearts.filter(h => h.id !== heartId);
     }, 2000);
   }
 
@@ -125,6 +143,11 @@
         ? tileData.value * gameState[team].multiplier 
         : tileData.value;
       createFlyingCoin(actualPoints, gameState[team].name);
+    }
+    
+    // Create flying heart effect for life gained
+    if (tileData.type === 'life') {
+      createFlyingHeart(gameState[team].name);
     }
     
     // Show tile result message
@@ -324,7 +347,14 @@
     transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 60000;
-    animation: coin-fly 2s ease-out forwards;
+  }
+  
+  .fly-to-team1 {
+    animation: coin-fly-team1 2s ease-out forwards;
+  }
+  
+  .fly-to-team2 {
+    animation: coin-fly-team2 2s ease-out forwards;
   }
   
   .coin-container {
@@ -332,6 +362,37 @@
     flex-direction: column;
     align-items: center;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  }
+  
+  .flying-heart {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 60000;
+  }
+  
+  .heart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  }
+  
+  .heart-icon {
+    font-size: 60px;
+    color: #ef4444;
+    animation: heart-beat 2s ease-out infinite;
+  }
+  
+  .heart-text {
+    color: #ef4444;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 8px;
+    font-family: 'Alfa Slab One', cursive;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
   
   .coin-image {
@@ -350,7 +411,7 @@
     animation: fade-scale 2s ease-out forwards;
   }
   
-  @keyframes coin-fly {
+  @keyframes coin-fly-team1 {
     0% {
       transform: translate(-50%, -50%) scale(0.5);
       opacity: 0;
@@ -359,17 +420,47 @@
       transform: translate(-50%, -60%) scale(1.2);
       opacity: 1;
     }
-    40% {
-      transform: translate(-50%, -80%) scale(1);
+    60% {
+      transform: translate(-300%, -200%) scale(1);
       opacity: 1;
     }
-    70% {
-      transform: translate(-50%, -120%) scale(0.8);
-      opacity: 0.8;
+    100% {
+      transform: translate(-400%, -250%) scale(0.3);
+      opacity: 0;
+    }
+  }
+  
+  @keyframes coin-fly-team2 {
+    0% {
+      transform: translate(-50%, -50%) scale(0.5);
+      opacity: 0;
+    }
+    20% {
+      transform: translate(-50%, -60%) scale(1.2);
+      opacity: 1;
+    }
+    60% {
+      transform: translate(200%, -200%) scale(1);
+      opacity: 1;
     }
     100% {
-      transform: translate(-50%, -200%) scale(0.3);
+      transform: translate(300%, -250%) scale(0.3);
       opacity: 0;
+    }
+  }
+  
+  @keyframes heart-beat {
+    0%, 100% {
+      transform: scale(1);
+    }
+    25% {
+      transform: scale(1.1);
+    }
+    50% {
+      transform: scale(1.2);
+    }
+    75% {
+      transform: scale(1.1);
     }
   }
   
@@ -1010,10 +1101,20 @@
   
   <!-- Flying Coins Animation -->
   {#each flyingCoins as coin (coin.id)}
-    <div class="flying-coin">
+    <div class="flying-coin {coin.isTeam1 ? 'fly-to-team1' : 'fly-to-team2'}">
       <div class="coin-container">
         <img src="/assets/coin.svg" alt="Coin" class="coin-image" />
         <span class="coin-points">+{coin.points}</span>
+      </div>
+    </div>
+  {/each}
+  
+  <!-- Flying Hearts Animation -->
+  {#each flyingHearts as heart (heart.id)}
+    <div class="flying-heart {heart.isTeam1 ? 'fly-to-team1' : 'fly-to-team2'}">
+      <div class="heart-container">
+        <i class="fas fa-heart heart-icon"></i>
+        <span class="heart-text">+1 LIFE</span>
       </div>
     </div>
   {/each}
