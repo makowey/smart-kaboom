@@ -531,6 +531,20 @@
     background: linear-gradient(145deg, rgba(34, 197, 94, 1), rgba(22, 163, 74, 0.9));
   }
   
+  .download-button {
+    background: linear-gradient(145deg, rgba(139, 69, 19, 0.9), rgba(101, 48, 13, 0.8));
+    text-decoration: none !important;
+  }
+  
+  .download-button:hover {
+    background: linear-gradient(145deg, rgba(139, 69, 19, 1), rgba(101, 48, 13, 0.9));
+    text-decoration: none !important;
+  }
+  
+  .download-button:visited {
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+  
   .reset-button {
     background: linear-gradient(145deg, rgba(107, 114, 128, 0.9), rgba(75, 85, 99, 0.8));
   }
@@ -554,6 +568,30 @@
       <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 125px; height: 125px;" />
       <h1 class="text-5xl font-bold text-white drop-shadow-lg fallback-title" style="font-family: 'Alfa Slab One', cursive; letter-spacing: 0.1em;">Smart Kaboom</h1>
       <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 125px; height: 125px;" />
+    </div>
+    
+    <!-- Download Section -->
+    <div class="text-center mb-6">
+      <p class="text-white text-lg mb-4 font-comic drop-shadow">Download the desktop app for offline play:</p>
+      <div class="flex gap-4 justify-center flex-wrap">
+        <a 
+          href="https://github.com/makowey/smart-kaboom/releases/latest"
+          class="svg-button download-button px-8 py-4 font-bold transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-110 font-comic no-underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <i class="fab fa-apple mr-8 text-2xl"></i>Download for Mac
+        </a>
+        
+        <a 
+          href="https://github.com/makowey/smart-kaboom/releases/latest"
+          class="svg-button download-button px-8 py-4 font-bold transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-110 font-comic no-underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <i class="fab fa-windows mr-8 text-2xl"></i>Download for Windows
+        </a>
+      </div>
     </div>
     
     {#if !gameState.gameOver}
