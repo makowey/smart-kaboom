@@ -17,10 +17,10 @@
 
   export let teamId; // Add teamId prop to identify which team this board belongs to
 
-  function handleTileFlip(row, col) {
+  function handleTileFlip(row, col, event) {
     const tileId = `${row}-${col}`;
     if (!flippedTiles.has(tileId) && onTileFlip) {
-      onTileFlip(teamId, row, col, board[row][col]);
+      onTileFlip(teamId, row, col, board[row][col], event);
     }
   }
 </script>
@@ -80,7 +80,7 @@
           {tileData}
           tileNumber={rowIndex * 8 + colIndex + 1}
           isFlipped={flippedTiles.has(`${rowIndex}-${colIndex}`)}
-          onFlip={isActive ? () => handleTileFlip(rowIndex, colIndex) : null}
+          onFlip={isActive ? (event) => handleTileFlip(rowIndex, colIndex, event) : null}
         />
       {/each}
     {/each}

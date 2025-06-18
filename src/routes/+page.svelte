@@ -61,15 +61,14 @@
     maxTries: settings.maxTries
   };
 
-  function createFlyingCoin(points, teamName, startElement) {
+  function createFlyingCoin(points, teamName, tilePosition) {
     const coinId = Date.now() + Math.random();
     
     // Get the position of the clicked tile
     let startX = '50%', startY = '50%';
-    if (startElement) {
-      const rect = startElement.getBoundingClientRect();
-      startX = rect.left + rect.width / 2 + 'px';
-      startY = rect.top + rect.height / 2 + 'px';
+    if (tilePosition) {
+      startX = tilePosition.x + 'px';
+      startY = tilePosition.y + 'px';
     }
     
     const coin = {
@@ -89,15 +88,14 @@
     }, 2000);
   }
 
-  function createFlyingHeart(teamName, startElement) {
+  function createFlyingHeart(teamName, tilePosition) {
     const heartId = Date.now() + Math.random();
     
     // Get the position of the clicked tile
     let startX = '50%', startY = '50%';
-    if (startElement) {
-      const rect = startElement.getBoundingClientRect();
-      startX = rect.left + rect.width / 2 + 'px';
-      startY = rect.top + rect.height / 2 + 'px';
+    if (tilePosition) {
+      startX = tilePosition.x + 'px';
+      startY = tilePosition.y + 'px';
     }
     
     const heart = {
@@ -159,20 +157,20 @@
     const previousTeam = gameState.currentTeam;
     const result = processTileFlip(gameState, team, row, col, tileData);
     
-    // Get the clicked tile element
-    const tileElement = event?.target?.closest('.tile') || event?.currentTarget;
+    // Get the tile position from the event
+    const tilePosition = event?.tilePosition;
     
     // Create flying coin effect for points
     if (tileData.type === 'points' || tileData.type === 'try_again') {
       const actualPoints = tileData.type === 'points' 
         ? tileData.value * gameState[team].multiplier 
         : tileData.value;
-      createFlyingCoin(actualPoints, gameState[team].name, tileElement);
+      createFlyingCoin(actualPoints, gameState[team].name, tilePosition);
     }
     
     // Create flying heart effect for life gained
     if (tileData.type === 'life') {
-      createFlyingHeart(gameState[team].name, tileElement);
+      createFlyingHeart(gameState[team].name, tilePosition);
     }
     
     // Show tile result message

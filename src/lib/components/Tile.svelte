@@ -6,11 +6,21 @@
 
   let isRevealing = false;
 
-  function handleClick() {
+  function handleClick(event) {
     if (!isFlipped && !isRevealing && onFlip) {
       isRevealing = true;
+      
+      // Capture tile position immediately before the delay
+      const tileElement = event.currentTarget;
+      const rect = tileElement.getBoundingClientRect();
+      const tilePosition = {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+      };
+      
       setTimeout(() => {
-        onFlip();
+        // Pass the captured position along with the event
+        onFlip({ ...event, tilePosition });
         isRevealing = false;
       }, 1500);
     }
@@ -34,7 +44,7 @@
   on:click={handleClick}
   role="button"
   tabindex="{isFlipped || isRevealing || !onFlip ? -1 : 0}"
-  on:keydown={(e) => e.key === 'Enter' && handleClick()}
+  on:keydown={(e) => e.key === 'Enter' && handleClick(e)}
 >
   {#if !isFlipped && !isRevealing}
     <!-- Front face (unflipped) -->
