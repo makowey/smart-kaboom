@@ -850,7 +850,7 @@
     
     
     <!-- Always visible button row -->
-    <div class="text-center mb-6">
+    <div class="text-center mb-10">
       <div class="flex justify-center mb-4 flex-wrap" style="gap: 2rem;">
         {#if !gameState.gameOver}
           <button 
