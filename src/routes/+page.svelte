@@ -909,7 +909,7 @@
       </div>
       
       <!-- Center buttons -->
-      <div class="flex gap-6 absolute left-1/2 transform -translate-x-1/2">
+      <div class="flex absolute left-1/2 transform -translate-x-1/2" style="gap: 2rem;">
         {#if gameState.gameOver}
           <button 
             class="icon-button icon-new-game-button"
