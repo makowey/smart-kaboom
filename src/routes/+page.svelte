@@ -901,7 +901,12 @@
   <div class="mx-auto px-4" style="max-width: 1800px; margin-top: -50px;">
     <div class="flex items-center justify-center mb-4 gap-6">
       <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 60px; height: 60px;" />
-      <h1 class="text-xl font-bold text-white drop-shadow-lg fallback-title" style="font-family: 'Alfa Slab One', cursive; letter-spacing: 0.1em;">Smart Kaboom</h1>
+      <div class="flex flex-col items-center">
+        <h1 class="text-xl font-bold text-white drop-shadow-lg fallback-title" style="font-family: 'Alfa Slab One', cursive; letter-spacing: 0.1em;">Smart Kaboom</h1>
+        <div class="text-sm text-white opacity-80 mt-1" style="font-family: 'Alfa Slab One', cursive;">
+          First to {settings.winCondition} points wins!
+        </div>
+      </div>
       <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 60px; height: 60px;" />
     </div>
     
@@ -965,6 +970,7 @@
           allTilesFlipped={gameState.team1.allTilesFlipped}
           onPassTurn={passTurn}
           isWinner={gameState.gameOver && gameState.winner === 'team1'}
+          winCondition={settings.winCondition}
         />
         {#if gameState.currentTeam === 'team1' && !gameState.gameOver && !gameState.team1.hasPassedTurn && gameState.team1.canContinue}
           <div class="absolute -top-2 -left-2 w-6 h-6 bg-yellow-400 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
@@ -986,6 +992,7 @@
           allTilesFlipped={gameState.team2.allTilesFlipped}
           onPassTurn={passTurn}
           isWinner={gameState.gameOver && gameState.winner === 'team2'}
+          winCondition={settings.winCondition}
         />
         {#if gameState.currentTeam === 'team2' && !gameState.gameOver && !gameState.team2.hasPassedTurn && gameState.team2.canContinue}
           <div class="absolute -top-2 -left-2 w-6 h-6 bg-yellow-400 rounded-full animate-pulse shadow-lg border-2 border-white"></div>

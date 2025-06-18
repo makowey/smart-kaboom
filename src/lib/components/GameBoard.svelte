@@ -14,6 +14,9 @@
   export let allTilesFlipped = false;
   export let onPassTurn = null;
   export let isWinner = false;
+  export let winCondition = 501;
+  
+  $: progressPercentage = Math.min((score / winCondition) * 100, 100);
 
   let board = createBoard();
 
@@ -83,6 +86,16 @@
           {#each Array(4) as _, i}
             <i class="fas fa-heart" style="font-size: 26px; color: {i < lives ? '#DC2626' : '#9CA3AF'}; margin-left: {i > 0 ? '6px' : '0'};"></i>
           {/each}
+        </div>
+      </div>
+      
+      <!-- Progress Bar -->
+      <div class="progress-bar-container" style="margin-top: 8px;">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width: {progressPercentage}%"></div>
+          <div class="progress-bar-text">
+            {score} / {winCondition}
+          </div>
         </div>
       </div>
     </div>
@@ -200,5 +213,64 @@
       transform: scale(1.05);
       box-shadow: 0 0 0 10px rgba(255, 165, 0, 0);
     }
+  }
+  
+  /* Progress Bar Styles */
+  .progress-bar-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .progress-bar-bg {
+    position: relative;
+    width: 100%;
+    height: 24px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  .progress-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #34d399, #6ee7b7);
+    border-radius: 10px;
+    transition: width 0.8s ease-out;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  }
+  
+  .progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    border-radius: 10px;
+    animation: shimmer 2s infinite;
+  }
+  
+  .progress-bar-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Alfa Slab One', cursive;
+    font-size: 12px;
+    font-weight: bold;
+    color: #000;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    z-index: 2;
+  }
+  
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
   }
 </style>
