@@ -45,25 +45,25 @@
         </div>
       {/if}
     </div>
-    <div class="flex justify-center items-center gap-20 mb-8">
+    <div class="flex flex-col lg:flex-row justify-center items-center gap-32 mb-12">
       <!-- Score Display -->
-      <div class="flex items-center bg-white px-16 py-10 rounded-3xl shadow-2xl border-4 border-gray-200">
-        <img src="/assets/coin.svg" alt="Coin" class="w-16 h-16 mr-8 drop-shadow-md" />
-        <span class="font-bold text-black text-6xl" style="font-family: 'Alfa Slab One', cursive; text-shadow: none;">{score}</span>
+      <div class="flex items-center justify-center min-w-[300px]" style="background: #FFFFFF; padding: 40px 60px; border-radius: 50px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border: 8px solid #CCCCCC;">
+        <img src="/assets/coin.svg" alt="Coin" style="width: 80px; height: 80px; margin-right: 40px;" />
+        <span style="font-family: 'Alfa Slab One', cursive; font-size: 120px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">{score}</span>
       </div>
 
       <!-- Lives Display -->
-      <div class="flex items-center bg-white px-14 py-10 rounded-3xl shadow-2xl border-4 border-gray-200">
+      <div class="flex items-center justify-center min-w-[300px]" style="background: #FFFFFF; padding: 40px 50px; border-radius: 50px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border: 8px solid #CCCCCC;">
         {#each Array(4) as _, i}
-          <i class="fas fa-heart text-5xl {i < lives ? 'text-red-600' : 'text-gray-400'} {i > 0 ? 'ml-6' : ''}"></i>
+          <i class="fas fa-heart" style="font-size: 80px; color: {i < lives ? '#DC2626' : '#9CA3AF'}; margin-left: {i > 0 ? '30px' : '0'};"></i>
         {/each}
       </div>
 
       <!-- Multiplier Display -->
       {#if multiplier > 1}
-        <div class="flex items-center bg-white px-16 py-10 rounded-3xl shadow-2xl border-4 border-yellow-300">
-          <i class="fas fa-star mr-8 text-yellow-600 text-6xl animate-spin-slow"></i>
-          <span class="font-bold text-black text-6xl" style="font-family: 'Alfa Slab One', cursive; text-shadow: none;">x{multiplier}</span>
+        <div class="flex items-center justify-center min-w-[300px]" style="background: #FFFFFF; padding: 40px 60px; border-radius: 50px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border: 8px solid #FCD34D;">
+          <i class="fas fa-star" style="font-size: 100px; color: #D97706; margin-right: 40px;"></i>
+          <span style="font-family: 'Alfa Slab One', cursive; font-size: 120px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">x{multiplier}</span>
         </div>
       {/if}
     </div>
