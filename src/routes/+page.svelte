@@ -867,16 +867,7 @@
     <!-- Always visible button row -->
     <div class="text-center mb-16">
       <div class="flex justify-center mb-4 flex-wrap" style="gap: 2rem;">
-        {#if !gameState.gameOver}
-          <button 
-            class="icon-button icon-pass-button"
-            on:click={!gameState[gameState.currentTeam].hasPassedTurn && gameState[gameState.currentTeam].canContinue ? passTurn : null}
-            disabled={gameState[gameState.currentTeam].hasPassedTurn || !gameState[gameState.currentTeam].canContinue}
-            title="Pass Turn"
-          >
-            <i class="fas fa-hand-paper"></i>
-          </button>
-        {:else}
+        {#if gameState.gameOver}
           <button 
             class="icon-button icon-new-game-button"
             on:click={resetGame}
@@ -930,6 +921,7 @@
           hasPassedTurn={gameState.team1.hasPassedTurn}
           canContinue={gameState.team1.canContinue}
           allTilesFlipped={gameState.team1.allTilesFlipped}
+          onPassTurn={passTurn}
         />
         {#if gameState.currentTeam === 'team1' && !gameState.gameOver && !gameState.team1.hasPassedTurn && gameState.team1.canContinue}
           <div class="absolute -top-2 -left-2 w-6 h-6 bg-yellow-400 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
@@ -949,6 +941,7 @@
           hasPassedTurn={gameState.team2.hasPassedTurn}
           canContinue={gameState.team2.canContinue}
           allTilesFlipped={gameState.team2.allTilesFlipped}
+          onPassTurn={passTurn}
         />
         {#if gameState.currentTeam === 'team2' && !gameState.gameOver && !gameState.team2.hasPassedTurn && gameState.team2.canContinue}
           <div class="absolute -top-2 -left-2 w-6 h-6 bg-yellow-400 rounded-full animate-pulse shadow-lg border-2 border-white"></div>

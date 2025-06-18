@@ -12,6 +12,7 @@
   export let hasPassedTurn = false;
   export let canContinue = true;
   export let allTilesFlipped = false;
+  export let onPassTurn = null;
 
   let board = createBoard();
 
@@ -38,7 +39,19 @@
 
         <!-- Team Name and Status (Center) -->
         <div class="flex flex-col items-center">
-          <h2 style="font-family: 'Alfa Slab One', cursive; font-size: 26px; font-weight: bold; color: #000000; text-shadow: 0 2px 4px rgba(0,0,0,0.2); margin: 0; line-height: 1; margin-bottom: 4px;">{teamName}</h2>
+          <div class="flex items-center gap-3 mb-1">
+            <h2 style="font-family: 'Alfa Slab One', cursive; font-size: 26px; font-weight: bold; color: #000000; text-shadow: 0 2px 4px rgba(0,0,0,0.2); margin: 0; line-height: 1;">{teamName}</h2>
+            {#if isActive && onPassTurn && !hasPassedTurn && canContinue}
+              <button 
+                class="icon-button icon-pass-button"
+                on:click={onPassTurn}
+                title="Pass Turn"
+                style="width: 35px; height: 35px;"
+              >
+                <i class="fas fa-hand-paper" style="font-size: 16px;"></i>
+              </button>
+            {/if}
+          </div>
           <div class="flex gap-1">
             {#if hasPassedTurn}
               <div class="bg-red-600 text-white px-2 py-1 rounded-full text-xs font-bold font-comic shadow-lg animate-pulse">
