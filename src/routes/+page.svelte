@@ -843,9 +843,9 @@
 
   <div class="mx-auto px-4" style="max-width: 1800px;">
     <div class="flex items-center justify-center mb-4 gap-6">
-      <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 125px; height: 125px;" />
+      <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 60px; height: 60px;" />
       <h1 class="text-xl font-bold text-white drop-shadow-lg fallback-title" style="font-family: 'Alfa Slab One', cursive; letter-spacing: 0.1em;">Smart Kaboom</h1>
-      <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 125px; height: 125px;" />
+      <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 60px; height: 60px;" />
     </div>
     
     
