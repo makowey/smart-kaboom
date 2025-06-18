@@ -28,20 +28,20 @@
 <div class="game-board p-6 rounded-2xl shadow-2xl backdrop-blur-sm transition-all duration-300 {teamId === 'team1' ? 'bg-orange-400 bg-opacity-20 border-4 border-orange-500' : 'bg-purple-400 bg-opacity-20 border-4 border-purple-500'} {isActive ? 'glow-active' : 'inactive-board'}">
   <div class="text-center mb-4">
     <!-- Unified Team Header Panel -->
-    <div style="background: rgba(255, 255, 255, 0.95); padding: 15px 25px; border-radius: 25px; box-shadow: 0 15px 30px rgba(0,0,0,0.4); border: 4px solid rgba(255,255,255,0.8); backdrop-filter: blur(10px); margin-bottom: 16px;">
+    <div style="background: rgba(255, 255, 255, 0.95); padding: 12px 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); border: 3px solid rgba(255,255,255,0.8); backdrop-filter: blur(10px); margin-bottom: 12px;">
       <div class="flex items-center justify-between">
         <!-- Score Display (Left) -->
-        <div class="flex items-center" style="background: rgba(255, 255, 255, 0.8); padding: 8px 14px; border-radius: 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); border: 2px solid rgba(0,0,0,0.1);">
-          <img src="/assets/coin.svg" alt="Coin" style="width: 30px; height: 30px; margin-right: 10px;" />
-          <span style="font-family: 'Alfa Slab One', cursive; font-size: 40px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">{score}</span>
+        <div class="flex items-center" style="background: rgba(255, 255, 255, 0.8); padding: 6px 12px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); border: 2px solid rgba(0,0,0,0.1);">
+          <img src="/assets/coin.svg" alt="Coin" style="width: 26px; height: 26px; margin-right: 8px;" />
+          <span style="font-family: 'Alfa Slab One', cursive; font-size: 34px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">{score}</span>
         </div>
 
         <!-- Team Name and Status (Center) -->
-        <div class="flex flex-col items-center gap-1">
-          <h2 style="font-family: 'Alfa Slab One', cursive; font-size: 30px; font-weight: bold; color: #000000; text-shadow: 0 2px 4px rgba(0,0,0,0.2); margin: 0; line-height: 1;">{teamName}</h2>
-          <div class="flex gap-2">
+        <div class="flex flex-col items-center">
+          <h2 style="font-family: 'Alfa Slab One', cursive; font-size: 26px; font-weight: bold; color: #000000; text-shadow: 0 2px 4px rgba(0,0,0,0.2); margin: 0; line-height: 1; margin-bottom: 4px;">{teamName}</h2>
+          <div class="flex gap-1">
             {#if hasPassedTurn}
-              <div class="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold font-comic shadow-lg animate-pulse">
+              <div class="bg-red-600 text-white px-2 py-1 rounded-full text-xs font-bold font-comic shadow-lg animate-pulse">
                 <i class="fas fa-flag mr-1"></i>PASSED
               </div>
             {/if}
@@ -56,18 +56,18 @@
               </div>
             {/if}
             {#if multiplier > 1}
-              <div class="flex items-center" style="background: rgba(255, 255, 255, 0.8); padding: 6px 10px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); border: 2px solid #FCD34D;">
-                <i class="fas fa-star" style="font-size: 16px; color: #D97706; margin-right: 4px;"></i>
-                <span style="font-family: 'Alfa Slab One', cursive; font-size: 20px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">x{multiplier}</span>
+              <div class="flex items-center" style="background: rgba(255, 255, 255, 0.8); padding: 4px 8px; border-radius: 10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); border: 2px solid #FCD34D;">
+                <i class="fas fa-star" style="font-size: 14px; color: #D97706; margin-right: 3px;"></i>
+                <span style="font-family: 'Alfa Slab One', cursive; font-size: 16px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">x{multiplier}</span>
               </div>
             {/if}
           </div>
         </div>
 
         <!-- Lives Display (Right) -->
-        <div class="flex items-center" style="background: rgba(255, 255, 255, 0.8); padding: 8px 12px; border-radius: 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); border: 2px solid rgba(0,0,0,0.1);">
+        <div class="flex items-center" style="background: rgba(255, 255, 255, 0.8); padding: 6px 10px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); border: 2px solid rgba(0,0,0,0.1);">
           {#each Array(4) as _, i}
-            <i class="fas fa-heart" style="font-size: 30px; color: {i < lives ? '#DC2626' : '#9CA3AF'}; margin-left: {i > 0 ? '8px' : '0'};"></i>
+            <i class="fas fa-heart" style="font-size: 26px; color: {i < lives ? '#DC2626' : '#9CA3AF'}; margin-left: {i > 0 ? '6px' : '0'};"></i>
           {/each}
         </div>
       </div>
