@@ -901,7 +901,7 @@
       </div>
     {/if}
 
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8 fallback-grid justify-center">
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8 fallback-grid justify-center" style="margin-top: 4rem;">
       <div class="relative">
         <GameBoard 
           teamName={settings.team1Name}
