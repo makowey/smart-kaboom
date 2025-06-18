@@ -13,6 +13,7 @@
   export let canContinue = true;
   export let allTilesFlipped = false;
   export let onPassTurn = null;
+  export let isWinner = false;
 
   let board = createBoard();
 
@@ -26,7 +27,7 @@
   }
 </script>
 
-<div class="game-board p-6 rounded-2xl shadow-2xl backdrop-blur-sm transition-all duration-300 {teamId === 'team1' ? 'bg-orange-400 bg-opacity-20 border-4 border-orange-500' : 'bg-purple-400 bg-opacity-20 border-4 border-purple-500'} {isActive ? 'glow-active' : 'inactive-board'}">
+<div class="game-board p-6 rounded-2xl shadow-2xl backdrop-blur-sm transition-all duration-300 {teamId === 'team1' ? 'bg-orange-400 bg-opacity-20 border-4 border-orange-500' : 'bg-purple-400 bg-opacity-20 border-4 border-purple-500'} {isWinner ? 'glow-winner' : isActive ? 'glow-active' : 'inactive-board'}">
   <div class="text-center mb-4">
     <!-- Unified Team Header Panel -->
     <div style="background: rgba(255, 255, 255, 0.95); padding: 12px 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); border: 3px solid rgba(255,255,255,0.8); backdrop-filter: blur(10px); margin-bottom: 12px;">
@@ -134,6 +135,37 @@
   .inactive-board {
     opacity: 0.6;
     filter: grayscale(0.3) brightness(0.8);
+  }
+  
+  .glow-winner {
+    box-shadow: 
+      0 0 30px rgba(255, 215, 0, 1),
+      0 0 60px rgba(255, 215, 0, 0.8),
+      0 0 90px rgba(255, 215, 0, 0.6),
+      0 0 120px rgba(255, 215, 0, 0.4),
+      inset 0 0 30px rgba(255, 215, 0, 0.3);
+    animation: pulse-winner 1.5s ease-in-out infinite alternate;
+    border: 4px solid rgba(255, 215, 0, 1) !important;
+    transform: scale(1.02);
+  }
+  
+  @keyframes pulse-winner {
+    from {
+      box-shadow: 
+        0 0 30px rgba(255, 215, 0, 1),
+        0 0 60px rgba(255, 215, 0, 0.8),
+        0 0 90px rgba(255, 215, 0, 0.6),
+        0 0 120px rgba(255, 215, 0, 0.4),
+        inset 0 0 30px rgba(255, 215, 0, 0.3);
+    }
+    to {
+      box-shadow: 
+        0 0 40px rgba(255, 215, 0, 1),
+        0 0 80px rgba(255, 215, 0, 1),
+        0 0 120px rgba(255, 215, 0, 0.8),
+        0 0 160px rgba(255, 215, 0, 0.6),
+        inset 0 0 40px rgba(255, 215, 0, 0.4);
+    }
   }
   
   /* Pass Turn button styles */

@@ -964,6 +964,7 @@
           canContinue={gameState.team1.canContinue}
           allTilesFlipped={gameState.team1.allTilesFlipped}
           onPassTurn={passTurn}
+          isWinner={gameState.gameOver && gameState.winner === 'team1'}
         />
         {#if gameState.currentTeam === 'team1' && !gameState.gameOver && !gameState.team1.hasPassedTurn && gameState.team1.canContinue}
           <div class="absolute -top-2 -left-2 w-6 h-6 bg-yellow-400 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
@@ -984,6 +985,7 @@
           canContinue={gameState.team2.canContinue}
           allTilesFlipped={gameState.team2.allTilesFlipped}
           onPassTurn={passTurn}
+          isWinner={gameState.gameOver && gameState.winner === 'team2'}
         />
         {#if gameState.currentTeam === 'team2' && !gameState.gameOver && !gameState.team2.hasPassedTurn && gameState.team2.canContinue}
           <div class="absolute -top-2 -left-2 w-6 h-6 bg-yellow-400 rounded-full animate-pulse shadow-lg border-2 border-white"></div>
