@@ -61,7 +61,7 @@
     maxTries: settings.maxTries
   };
 
-  function createFlyingCoin(points, teamName, tilePosition) {
+  function createFlyingCoin(points, teamName, tilePosition, onComplete = null) {
     const coinId = Date.now() + Math.random();
     
     // Get the position of the clicked tile
@@ -82,9 +82,12 @@
     
     flyingCoins = [...flyingCoins, coin];
     
-    // Remove coin after animation completes
+    // Remove coin after animation completes and trigger callback
     setTimeout(() => {
       flyingCoins = flyingCoins.filter(c => c.id !== coinId);
+      if (onComplete) {
+        onComplete();
+      }
     }, 2000);
   }
 
@@ -155,22 +158,42 @@
     if (gameState.currentTeam !== team || gameState.gameOver) return;
     
     const previousTeam = gameState.currentTeam;
-    const result = processTileFlip(gameState, team, row, col, tileData);
+    let result;
     
     // Get the tile position from the event
     const tilePosition = event?.tilePosition;
     
-    // Create flying coin effect for points
+    // For points, calculate but don't add immediately - wait for animation
     if (tileData.type === 'points' || tileData.type === 'try_again') {
       const actualPoints = tileData.type === 'points' 
         ? tileData.value * gameState[team].multiplier 
         : tileData.value;
-      createFlyingCoin(actualPoints, gameState[team].name, tilePosition);
-    }
-    
-    // Create flying heart effect for life gained (only if actually gained)
-    if (tileData.type === 'life' && result.message.includes('Extra life gained!')) {
-      createFlyingHeart(gameState[team].name, tilePosition);
+      
+      // Store original score for delayed update
+      const originalScore = gameState[team].score;
+      
+      // Process the tile flip but temporarily revert score changes for points
+      result = processTileFlip(gameState, team, row, col, tileData);
+      
+      // Revert the score change temporarily
+      gameState[team].score = originalScore;
+      
+      // Create flying coin with callback to add points when animation completes
+      createFlyingCoin(actualPoints, gameState[team].name, tilePosition, () => {
+        gameState[team].score += actualPoints;
+        if (tileData.type === 'points') {
+          gameState[team].multiplier = 1; // Reset multiplier after use
+        }
+        gameState = gameState; // Trigger reactivity
+      });
+    } else {
+      // For non-point tiles, process normally
+      result = processTileFlip(gameState, team, row, col, tileData);
+      
+      // Create flying heart effect for life gained (only if actually gained)
+      if (tileData.type === 'life' && result.message.includes('Extra life gained!')) {
+        createFlyingHeart(gameState[team].name, tilePosition);
+      }
     }
     
     // Show tile result message
