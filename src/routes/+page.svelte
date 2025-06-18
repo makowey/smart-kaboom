@@ -588,7 +588,7 @@
   <!-- Download Icons (Top Right Corner) -->
   <div class="download-corner">
     <a 
-      href="https://github.com/makowey/smart-kaboom/releases/latest"
+      href="https://github.com/makowey/smart-kaboom/releases"
       class="download-icon-button"
       target="_blank"
       rel="noopener noreferrer"
@@ -598,7 +598,7 @@
     </a>
     
     <a 
-      href="https://github.com/makowey/smart-kaboom/releases/latest"
+      href="https://github.com/makowey/smart-kaboom/releases"
       class="download-icon-button"
       target="_blank"
       rel="noopener noreferrer"
