@@ -371,9 +371,9 @@
 </script>
 
 <style>
-  /* Custom cursors - 15px size */
+  /* Custom cursors - 30px arrow, 15px hand */
   * {
-    cursor: url('/assets/cursor-small.png') 0 0, auto !important;
+    cursor: url('/assets/cursor-medium.png') 0 0, auto !important;
   }
   
   /* Pointer cursor for interactive elements */
