@@ -46,6 +46,7 @@
                 class="pass-turn-button"
                 on:click={onPassTurn}
                 title="Pass Turn"
+                style="margin-left: 24px;"
               >
                 <i class="fas fa-hand-paper" style="font-size: 16px;"></i>
               </button>
