@@ -722,6 +722,83 @@
   .download-icon-button i {
     font-size: 18px;
   }
+
+  /* Icon-only button styles matching download button format */
+  .icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+  }
+  
+  .icon-button:hover {
+    transform: scale(1.1);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: white;
+    text-decoration: none;
+  }
+  
+  .icon-button i {
+    font-size: 24px;
+  }
+  
+  .icon-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  .icon-pass-button {
+    background: linear-gradient(145deg, rgba(255, 165, 0, 0.9), rgba(255, 140, 0, 0.8));
+  }
+  
+  .icon-pass-button:hover {
+    background: linear-gradient(145deg, rgba(255, 165, 0, 1), rgba(255, 140, 0, 0.9));
+  }
+  
+  .icon-help-button {
+    background: linear-gradient(145deg, rgba(99, 102, 241, 0.9), rgba(79, 70, 229, 0.8));
+  }
+  
+  .icon-help-button:hover {
+    background: linear-gradient(145deg, rgba(99, 102, 241, 1), rgba(79, 70, 229, 0.9));
+  }
+  
+  .icon-settings-button {
+    background: linear-gradient(145deg, rgba(34, 197, 94, 0.9), rgba(22, 163, 74, 0.8));
+  }
+  
+  .icon-settings-button:hover {
+    background: linear-gradient(145deg, rgba(34, 197, 94, 1), rgba(22, 163, 74, 0.9));
+  }
+  
+  .icon-new-game-button {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(243, 244, 246, 0.9));
+    color: rgba(59, 130, 246, 0.9) !important;
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+  
+  .icon-new-game-button:hover {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(248, 250, 252, 0.95));
+    color: rgba(59, 130, 246, 1) !important;
+    border-color: rgba(59, 130, 246, 0.5);
+  }
+  
+  .icon-new-game-button i {
+    color: rgba(59, 130, 246, 0.85) !important;
+  }
+  
+  .icon-new-game-button:hover i {
+    color: rgba(59, 130, 246, 1) !important;
+  }
   
   .reset-button {
     background: linear-gradient(145deg, rgba(107, 114, 128, 0.9), rgba(75, 85, 99, 0.8));
@@ -767,7 +844,7 @@
   <div class="mx-auto px-4" style="max-width: 1800px;">
     <div class="flex items-center justify-center mb-4 gap-6">
       <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 125px; height: 125px;" />
-      <h1 class="text-3xl font-bold text-white drop-shadow-lg fallback-title" style="font-family: 'Alfa Slab One', cursive; letter-spacing: 0.1em;">Smart Kaboom</h1>
+      <h1 class="text-xl font-bold text-white drop-shadow-lg fallback-title" style="font-family: 'Alfa Slab One', cursive; letter-spacing: 0.1em;">Smart Kaboom</h1>
       <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 125px; height: 125px;" />
     </div>
     
@@ -776,25 +853,28 @@
       <div class="text-center mb-6">
         <div class="flex gap-4 justify-center mb-4 flex-wrap">
           <button 
-            class="svg-button pass-button px-12 py-5 font-bold transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-110 font-comic {gameState[gameState.currentTeam].hasPassedTurn || !gameState[gameState.currentTeam].canContinue ? 'opacity-50 cursor-not-allowed' : ''}"
+            class="icon-button icon-pass-button"
             on:click={!gameState[gameState.currentTeam].hasPassedTurn && gameState[gameState.currentTeam].canContinue ? passTurn : null}
             disabled={gameState[gameState.currentTeam].hasPassedTurn || !gameState[gameState.currentTeam].canContinue}
+            title="Pass Turn"
           >
-            <i class="fas fa-hand-paper mr-12 text-2xl"></i>Pass Turn
+            <i class="fas fa-hand-paper"></i>
           </button>
           
           <button 
-            class="svg-button help-button px-10 py-5 font-bold transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-110 font-comic"
+            class="icon-button icon-help-button"
             on:click={toggleLegend}
+            title="Help & Legend"
           >
-            <i class="fas fa-question-circle mr-12 text-2xl"></i>Help
+            <i class="fas fa-question-circle"></i>
           </button>
           
           <button 
-            class="svg-button settings-button px-10 py-5 font-bold transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-110 font-comic"
+            class="icon-button icon-settings-button"
             on:click={toggleSettings}
+            title="Settings"
           >
-            <i class="fas fa-cog mr-12 text-2xl"></i>Settings
+            <i class="fas fa-cog"></i>
           </button>
         </div>
       </div>
@@ -808,10 +888,11 @@
            '🤝 It\'s a Tie! 🤝'}
         </p>
         <button 
-          class="svg-button new-game-button mt-6 px-10 py-4 font-bold transition-colors shadow-lg font-comic"
+          class="icon-button icon-new-game-button mt-6"
           on:click={resetGame}
+          title="New Game"
         >
-          <i class="fas fa-gamepad mr-12 text-2xl"></i>New Game
+          <i class="fas fa-gamepad"></i>
         </button>
       </div>
     {/if}
