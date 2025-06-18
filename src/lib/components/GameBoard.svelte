@@ -46,19 +46,19 @@
       {/if}
     </div>
     <div class="flex justify-center items-center gap-8 text-xl">
-      <div class="flex items-center bg-white bg-opacity-20 px-6 py-4 rounded-full backdrop-blur-sm">
-        <i class="fas fa-coins mr-4 text-yellow-400 text-2xl drop-shadow-md"></i>
-        <span class="font-bold font-comic text-white drop-shadow-md text-2xl">{score}</span>
+      <div class="flex items-center bg-white bg-opacity-20 px-8 py-6 rounded-full backdrop-blur-sm">
+        <img src="/assets/coin.svg" alt="Coin" class="w-8 h-8 mr-6 drop-shadow-md" />
+        <span class="font-bold text-white drop-shadow-lg text-4xl font-comic">{score}</span>
       </div>
-      <div class="flex items-center bg-white bg-opacity-20 px-6 py-4 rounded-full backdrop-blur-sm">
+      <div class="flex items-center bg-white bg-opacity-20 px-8 py-6 rounded-full backdrop-blur-sm">
         {#each Array(4) as _, i}
-          <i class="fas fa-heart text-xl {i < lives ? 'text-red-400' : 'text-gray-400 opacity-30'} drop-shadow-md {i > 0 ? 'ml-2' : ''}"></i>
+          <i class="fas fa-heart text-2xl {i < lives ? 'text-red-400' : 'text-gray-400 opacity-30'} drop-shadow-md {i > 0 ? 'ml-3' : ''}"></i>
         {/each}
       </div>
       {#if multiplier > 1}
-        <div class="flex items-center bg-purple-500 bg-opacity-30 px-6 py-4 rounded-full backdrop-blur-sm animate-pulse">
-          <i class="fas fa-star mr-4 text-yellow-300 text-2xl drop-shadow-md animate-spin-slow"></i>
-          <span class="font-bold font-comic text-white drop-shadow-md text-2xl">x{multiplier}</span>
+        <div class="flex items-center bg-purple-500 bg-opacity-30 px-8 py-6 rounded-full backdrop-blur-sm animate-pulse">
+          <i class="fas fa-star mr-6 text-yellow-300 text-3xl drop-shadow-md animate-spin-slow"></i>
+          <span class="font-bold text-white drop-shadow-lg text-4xl font-comic">x{multiplier}</span>
         </div>
       {/if}
     </div>
