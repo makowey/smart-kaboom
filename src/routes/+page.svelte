@@ -899,16 +899,16 @@
   </div>
 
   <div class="mx-auto px-4" style="max-width: 1800px; margin-top: -50px;">
-    <div class="flex items-start justify-between mb-8">
-      <!-- Left header -->
-      <div class="flex items-center gap-4">
-        <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 60px; height: 60px;" />
-        <h1 class="text-xl font-bold text-white drop-shadow-lg fallback-title" style="font-family: 'Alfa Slab One', cursive; letter-spacing: 0.1em;">Smart Kaboom</h1>
-        <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 60px; height: 60px;" />
-      </div>
-      
-      <!-- Right buttons -->
-      <div class="flex gap-6">
+    <!-- Left header -->
+    <div class="flex items-center gap-4 mb-8">
+      <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 60px; height: 60px;" />
+      <h1 class="text-xl font-bold text-white drop-shadow-lg fallback-title" style="font-family: 'Alfa Slab One', cursive; letter-spacing: 0.1em;">Smart Kaboom</h1>
+      <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 60px; height: 60px;" />
+    </div>
+    
+    <!-- Centered buttons -->
+    <div class="text-center mb-8">
+      <div class="flex justify-center gap-6">
         {#if gameState.gameOver}
           <button 
             class="icon-button icon-new-game-button"
