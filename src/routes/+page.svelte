@@ -903,7 +903,7 @@
       <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 60px; height: 60px;" />
       <div class="flex flex-col items-center">
         <h1 class="text-xl font-bold text-white drop-shadow-lg fallback-title" style="font-family: 'Alfa Slab One', cursive; letter-spacing: 0.1em;">Smart Kaboom</h1>
-        <div class="text-sm text-white opacity-80 mt-1" style="font-family: 'Alfa Slab One', cursive;">
+        <div class="text-sm mt-1" style="font-family: 'Alfa Slab One', cursive; color: #FFD700; text-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 0 8px rgba(255,215,0,0.3);">
           First to {settings.winCondition} points wins!
         </div>
       </div>
