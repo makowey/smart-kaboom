@@ -1,4 +1,6 @@
 <script>
+  // UpdateModal.svelte - Version update notification for desktop apps only
+  // This modal only appears when running as a Tauri desktop application
   import { createEventDispatcher } from 'svelte';
   import { getPlatformIcon, formatFileSize } from '../services/versionCheck.js';
   

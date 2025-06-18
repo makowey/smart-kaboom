@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "productName": "Smart Kaboom",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "identifier": "com.amec.smart-kaboom",
   "build": {
     "beforeDevCommand": "npm run dev",

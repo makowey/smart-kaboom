@@ -3,7 +3,7 @@
   import Notification from '$lib/components/Notification.svelte';
   import UpdateModal from '$lib/components/UpdateModal.svelte';
   import { createGameState, processTileFlip } from '$lib/gameLogic.js';
-  import { checkForUpdates } from '$lib/services/versionCheck.js';
+  import { checkForUpdates, isDesktopApp } from '$lib/services/versionCheck.js';
   import { onMount } from 'svelte';
 
   let gameState = createGameState();
@@ -69,22 +69,33 @@
   // Check for updates on app startup
   async function performUpdateCheck() {
     try {
+      // Only perform update check for desktop apps
+      if (!isDesktopApp()) {
+        console.log('Smart Kaboom: Running as web app, skipping update check');
+        return;
+      }
+
+      console.log('Smart Kaboom: Running as desktop app, checking for updates...');
       const result = await checkForUpdates();
       
       // Check if user has skipped this version
       if (typeof localStorage !== 'undefined') {
         const skippedVersion = localStorage.getItem('smartKaboom_skipVersion');
         if (skippedVersion === result.latestVersion) {
+          console.log(`Smart Kaboom: User has skipped version ${result.latestVersion}`);
           return; // User has skipped this version
         }
       }
       
       if (result.hasUpdate && !result.error) {
+        console.log(`Smart Kaboom: Update available! Current: ${result.currentVersion}, Latest: ${result.latestVersion}`);
         updateInfo = result;
         showUpdateModal = true;
+      } else {
+        console.log('Smart Kaboom: No updates available or already up to date');
       }
     } catch (error) {
-      console.warn('Update check failed:', error);
+      console.warn('Smart Kaboom: Update check failed:', error);
     }
   }
 

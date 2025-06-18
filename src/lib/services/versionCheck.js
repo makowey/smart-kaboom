@@ -1,8 +1,23 @@
 // Version check service for Smart Kaboom
 const GITHUB_API_URL = 'https://api.github.com/repos/makowey/smart-kaboom/releases/latest';
-const CURRENT_VERSION = '1.0.7'; // This should match package.json version
+const CURRENT_VERSION = '1.0.8'; // This should match package.json version
+
+// Check if app is running as a Tauri desktop app
+export function isDesktopApp() {
+  return typeof window !== 'undefined' && window.__TAURI__ !== undefined;
+}
 
 export async function checkForUpdates() {
+  // Only check for updates if running as desktop app
+  if (!isDesktopApp()) {
+    return {
+      hasUpdate: false,
+      currentVersion: CURRENT_VERSION,
+      latestVersion: CURRENT_VERSION,
+      isWebVersion: true
+    };
+  }
+
   try {
     const response = await fetch(GITHUB_API_URL);
     if (!response.ok) {
