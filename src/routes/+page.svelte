@@ -289,7 +289,7 @@
   }
   
   .fallback-title {
-    font-size: 3rem;
+    font-size: 1.125rem;
     font-weight: bold;
     text-align: center;
     color: white;
