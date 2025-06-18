@@ -39,7 +39,7 @@
 
         <!-- Team Name and Status (Center) -->
         <div class="flex flex-col items-center">
-          <div class="flex items-center gap-3 mb-1">
+          <div class="flex items-center gap-6 mb-1">
             <h2 style="font-family: 'Alfa Slab One', cursive; font-size: 26px; font-weight: bold; color: #000000; text-shadow: 0 2px 4px rgba(0,0,0,0.2); margin: 0; line-height: 1;">{teamName}</h2>
             {#if isActive && onPassTurn && !hasPassedTurn && canContinue}
               <button 
