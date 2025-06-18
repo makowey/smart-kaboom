@@ -467,11 +467,11 @@
       opacity: 1;
     }
     60% {
-      transform: translate(200%, -200%) scale(1);
+      transform: translate(-200%, -200%) scale(1);
       opacity: 1;
     }
     100% {
-      transform: translate(300%, -250%) scale(0.3);
+      transform: translate(-300%, -250%) scale(0.3);
       opacity: 0;
     }
   }
@@ -505,11 +505,11 @@
       opacity: 1;
     }
     60% {
-      transform: translate(-200%, -200%) scale(1);
+      transform: translate(200%, -200%) scale(1);
       opacity: 1;
     }
     100% {
-      transform: translate(-300%, -250%) scale(0.3);
+      transform: translate(300%, -250%) scale(0.3);
       opacity: 0;
     }
   }
