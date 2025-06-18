@@ -876,14 +876,6 @@
         >
           <i class="fas fa-cog"></i>
         </button>
-        
-        <button 
-          class="icon-button icon-new-game-button"
-          on:click={resetGame}
-          title="New Game"
-        >
-          <i class="fas fa-gamepad"></i>
-        </button>
       </div>
     </div>
 
@@ -896,6 +888,13 @@
            gameState.team2.score > gameState.team1.score ? '🏆 Lightning Wolves Win! 🏆' : 
            '🤝 It\'s a Tie! 🤝'}
         </p>
+        <button 
+          class="icon-button icon-new-game-button mt-6"
+          on:click={resetGame}
+          title="New Game"
+        >
+          <i class="fas fa-gamepad"></i>
+        </button>
       </div>
     {/if}
 
