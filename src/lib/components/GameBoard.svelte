@@ -43,10 +43,9 @@
             <h2 style="font-family: 'Alfa Slab One', cursive; font-size: 26px; font-weight: bold; color: #000000; text-shadow: 0 2px 4px rgba(0,0,0,0.2); margin: 0; line-height: 1;">{teamName}</h2>
             {#if isActive && onPassTurn && !hasPassedTurn && canContinue}
               <button 
-                class="icon-button icon-pass-button"
+                class="pass-turn-button"
                 on:click={onPassTurn}
                 title="Pass Turn"
-                style="width: 35px; height: 35px;"
               >
                 <i class="fas fa-hand-paper" style="font-size: 16px;"></i>
               </button>
@@ -134,5 +133,39 @@
   .inactive-board {
     opacity: 0.6;
     filter: grayscale(0.3) brightness(0.8);
+  }
+  
+  /* Pass Turn button styles */
+  .pass-turn-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    color: white;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    background: linear-gradient(145deg, rgba(255, 165, 0, 0.9), rgba(255, 140, 0, 0.8));
+    animation: pulse-pass-button 2s ease-in-out infinite;
+  }
+  
+  .pass-turn-button:hover {
+    background: linear-gradient(145deg, rgba(255, 165, 0, 1), rgba(255, 140, 0, 0.9));
+    transform: scale(1.1);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  
+  @keyframes pulse-pass-button {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.7);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 10px rgba(255, 165, 0, 0);
+    }
   }
 </style>
