@@ -899,16 +899,17 @@
   </div>
 
   <div class="mx-auto px-4" style="max-width: 1800px; margin-top: -50px;">
-    <!-- Left header -->
-    <div class="flex items-center gap-4 mb-8">
-      <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 60px; height: 60px;" />
-      <h1 class="text-xl font-bold text-white drop-shadow-lg fallback-title" style="font-family: 'Alfa Slab One', cursive; letter-spacing: 0.1em;">Smart Kaboom</h1>
-      <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 60px; height: 60px;" />
-    </div>
-    
-    <!-- Centered buttons -->
-    <div class="text-center mb-8">
-      <div class="flex justify-center gap-6">
+    <!-- Header and buttons on same line -->
+    <div class="flex items-center justify-between mb-8">
+      <!-- Left header -->
+      <div class="flex items-center gap-4">
+        <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 60px; height: 60px;" />
+        <h1 class="text-xl font-bold text-white drop-shadow-lg fallback-title" style="font-family: 'Alfa Slab One', cursive; letter-spacing: 0.1em;">Smart Kaboom</h1>
+        <img src="/assets/bomb.svg" alt="Bomb Logo" class="drop-shadow-lg" style="width: 60px; height: 60px;" />
+      </div>
+      
+      <!-- Center buttons -->
+      <div class="flex gap-6 absolute left-1/2 transform -translate-x-1/2">
         {#if gameState.gameOver}
           <button 
             class="icon-button icon-new-game-button"
@@ -935,6 +936,9 @@
           <i class="fas fa-cog"></i>
         </button>
       </div>
+      
+      <!-- Right spacer for balance -->
+      <div class="w-0"></div>
     </div>
 
     <!-- Win Condition Display -->
