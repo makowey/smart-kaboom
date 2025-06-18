@@ -851,7 +851,7 @@
     
     <!-- Always visible button row -->
     <div class="text-center mb-6">
-      <div class="flex gap-4 justify-center mb-4 flex-wrap">
+      <div class="flex gap-8 justify-center mb-4 flex-wrap">
         <button 
           class="icon-button icon-pass-button"
           on:click={!gameState.gameOver && !gameState[gameState.currentTeam].hasPassedTurn && gameState[gameState.currentTeam].canContinue ? passTurn : null}
