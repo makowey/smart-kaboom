@@ -852,14 +852,24 @@
     <!-- Always visible button row -->
     <div class="text-center mb-6">
       <div class="flex gap-8 justify-center mb-4 flex-wrap">
-        <button 
-          class="icon-button icon-pass-button"
-          on:click={!gameState.gameOver && !gameState[gameState.currentTeam].hasPassedTurn && gameState[gameState.currentTeam].canContinue ? passTurn : null}
-          disabled={gameState.gameOver || gameState[gameState.currentTeam].hasPassedTurn || !gameState[gameState.currentTeam].canContinue}
-          title="Pass Turn"
-        >
-          <i class="fas fa-hand-paper"></i>
-        </button>
+        {#if !gameState.gameOver}
+          <button 
+            class="icon-button icon-pass-button"
+            on:click={!gameState[gameState.currentTeam].hasPassedTurn && gameState[gameState.currentTeam].canContinue ? passTurn : null}
+            disabled={gameState[gameState.currentTeam].hasPassedTurn || !gameState[gameState.currentTeam].canContinue}
+            title="Pass Turn"
+          >
+            <i class="fas fa-hand-paper"></i>
+          </button>
+        {:else}
+          <button 
+            class="icon-button icon-new-game-button"
+            on:click={resetGame}
+            title="New Game"
+          >
+            <i class="fas fa-gamepad"></i>
+          </button>
+        {/if}
         
         <button 
           class="icon-button icon-help-button"
@@ -888,13 +898,6 @@
            gameState.team2.score > gameState.team1.score ? '🏆 Lightning Wolves Win! 🏆' : 
            '🤝 It\'s a Tie! 🤝'}
         </p>
-        <button 
-          class="icon-button icon-new-game-button mt-6"
-          on:click={resetGame}
-          title="New Game"
-        >
-          <i class="fas fa-gamepad"></i>
-        </button>
       </div>
     {/if}
 
