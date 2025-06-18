@@ -849,36 +849,45 @@
     </div>
     
     
-    {#if !gameState.gameOver}
-      <div class="text-center mb-6">
-        <div class="flex gap-4 justify-center mb-4 flex-wrap">
-          <button 
-            class="icon-button icon-pass-button"
-            on:click={!gameState[gameState.currentTeam].hasPassedTurn && gameState[gameState.currentTeam].canContinue ? passTurn : null}
-            disabled={gameState[gameState.currentTeam].hasPassedTurn || !gameState[gameState.currentTeam].canContinue}
-            title="Pass Turn"
-          >
-            <i class="fas fa-hand-paper"></i>
-          </button>
-          
-          <button 
-            class="icon-button icon-help-button"
-            on:click={toggleLegend}
-            title="Help & Legend"
-          >
-            <i class="fas fa-question-circle"></i>
-          </button>
-          
-          <button 
-            class="icon-button icon-settings-button"
-            on:click={toggleSettings}
-            title="Settings"
-          >
-            <i class="fas fa-cog"></i>
-          </button>
-        </div>
+    <!-- Always visible button row -->
+    <div class="text-center mb-6">
+      <div class="flex gap-4 justify-center mb-4 flex-wrap">
+        <button 
+          class="icon-button icon-pass-button"
+          on:click={!gameState.gameOver && !gameState[gameState.currentTeam].hasPassedTurn && gameState[gameState.currentTeam].canContinue ? passTurn : null}
+          disabled={gameState.gameOver || gameState[gameState.currentTeam].hasPassedTurn || !gameState[gameState.currentTeam].canContinue}
+          title="Pass Turn"
+        >
+          <i class="fas fa-hand-paper"></i>
+        </button>
+        
+        <button 
+          class="icon-button icon-help-button"
+          on:click={toggleLegend}
+          title="Help & Legend"
+        >
+          <i class="fas fa-question-circle"></i>
+        </button>
+        
+        <button 
+          class="icon-button icon-settings-button"
+          on:click={toggleSettings}
+          title="Settings"
+        >
+          <i class="fas fa-cog"></i>
+        </button>
+        
+        <button 
+          class="icon-button icon-new-game-button"
+          on:click={resetGame}
+          title="New Game"
+        >
+          <i class="fas fa-gamepad"></i>
+        </button>
       </div>
-    {:else}
+    </div>
+
+    {#if gameState.gameOver}
       <div class="text-center mb-6">
         <h2 class="text-4xl font-bold text-white drop-shadow-lg mb-4" style="font-family: 'Alfa Slab One', cursive;">Game Over!</h2>
         <p class="text-2xl font-bold drop-shadow font-comic text-white">
@@ -887,13 +896,6 @@
            gameState.team2.score > gameState.team1.score ? '🏆 Lightning Wolves Win! 🏆' : 
            '🤝 It\'s a Tie! 🤝'}
         </p>
-        <button 
-          class="icon-button icon-new-game-button mt-6"
-          on:click={resetGame}
-          title="New Game"
-        >
-          <i class="fas fa-gamepad"></i>
-        </button>
       </div>
     {/if}
 
