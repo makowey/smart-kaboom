@@ -27,46 +27,49 @@
 
 <div class="game-board p-6 rounded-2xl shadow-2xl backdrop-blur-sm transition-all duration-300 {teamId === 'team1' ? 'bg-orange-400 bg-opacity-20 border-4 border-orange-500' : 'bg-purple-400 bg-opacity-20 border-4 border-purple-500'} {isActive ? 'glow-active' : 'inactive-board'}">
   <div class="text-center mb-4">
-    <div class="flex items-center justify-between mb-6">
-      <!-- Score Display (Left) -->
-      <div class="flex items-center" style="background: #FFFFFF; padding: 15px 20px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); border: 3px solid #CCCCCC;">
-        <img src="/assets/coin.svg" alt="Coin" style="width: 35px; height: 35px; margin-right: 12px;" />
-        <span style="font-family: 'Alfa Slab One', cursive; font-size: 48px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">{score}</span>
-      </div>
-
-      <!-- Team Name and Status (Center) -->
-      <div class="flex flex-col items-center gap-2">
-        <h2 class="text-3xl font-bold text-white drop-shadow-lg" style="font-family: 'Alfa Slab One', cursive; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">{teamName}</h2>
-        <div class="flex gap-2">
-          {#if hasPassedTurn}
-            <div class="bg-white text-red-600 px-4 py-2 rounded-full text-lg font-bold font-comic shadow-xl border-3 border-red-600 animate-pulse">
-              <i class="fas fa-flag mr-2"></i>PASSED
-            </div>
-          {/if}
-          {#if !canContinue && !hasPassedTurn}
-            <div class="bg-gray-600 text-white px-3 py-1 rounded-full text-sm font-bold font-comic shadow-lg border-2 border-white">
-              <i class="fas fa-skull mr-1"></i>OUT
-            </div>
-          {/if}
-          {#if allTilesFlipped && !hasPassedTurn && canContinue}
-            <div class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold font-comic shadow-lg border-2 border-white">
-              <i class="fas fa-check mr-1"></i>DONE
-            </div>
-          {/if}
-          {#if multiplier > 1}
-            <div class="flex items-center" style="background: #FFFFFF; padding: 8px 12px; border-radius: 15px; box-shadow: 0 5px 10px rgba(0,0,0,0.3); border: 2px solid #FCD34D;">
-              <i class="fas fa-star" style="font-size: 20px; color: #D97706; margin-right: 6px;"></i>
-              <span style="font-family: 'Alfa Slab One', cursive; font-size: 24px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">x{multiplier}</span>
-            </div>
-          {/if}
+    <!-- Unified Team Header Panel -->
+    <div style="background: rgba(255, 255, 255, 0.95); padding: 25px 30px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); border: 6px solid rgba(255,255,255,0.8); backdrop-filter: blur(10px); margin-bottom: 24px;">
+      <div class="flex items-center justify-between">
+        <!-- Score Display (Left) -->
+        <div class="flex items-center" style="background: rgba(255, 255, 255, 0.8); padding: 12px 18px; border-radius: 18px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); border: 2px solid rgba(0,0,0,0.1);">
+          <img src="/assets/coin.svg" alt="Coin" style="width: 35px; height: 35px; margin-right: 12px;" />
+          <span style="font-family: 'Alfa Slab One', cursive; font-size: 48px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">{score}</span>
         </div>
-      </div>
 
-      <!-- Lives Display (Right) -->
-      <div class="flex items-center" style="background: #FFFFFF; padding: 15px 18px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); border: 3px solid #CCCCCC;">
-        {#each Array(4) as _, i}
-          <i class="fas fa-heart" style="font-size: 35px; color: {i < lives ? '#DC2626' : '#9CA3AF'}; margin-left: {i > 0 ? '10px' : '0'};"></i>
-        {/each}
+        <!-- Team Name and Status (Center) -->
+        <div class="flex flex-col items-center gap-3">
+          <h2 style="font-family: 'Alfa Slab One', cursive; font-size: 36px; font-weight: bold; color: #000000; text-shadow: 0 2px 4px rgba(0,0,0,0.2); margin: 0;">{teamName}</h2>
+          <div class="flex gap-2">
+            {#if hasPassedTurn}
+              <div class="bg-red-600 text-white px-4 py-2 rounded-full text-lg font-bold font-comic shadow-lg animate-pulse">
+                <i class="fas fa-flag mr-2"></i>PASSED
+              </div>
+            {/if}
+            {#if !canContinue && !hasPassedTurn}
+              <div class="bg-gray-600 text-white px-3 py-1 rounded-full text-sm font-bold font-comic shadow-lg">
+                <i class="fas fa-skull mr-1"></i>OUT
+              </div>
+            {/if}
+            {#if allTilesFlipped && !hasPassedTurn && canContinue}
+              <div class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold font-comic shadow-lg">
+                <i class="fas fa-check mr-1"></i>DONE
+              </div>
+            {/if}
+            {#if multiplier > 1}
+              <div class="flex items-center" style="background: rgba(255, 255, 255, 0.8); padding: 8px 12px; border-radius: 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); border: 2px solid #FCD34D;">
+                <i class="fas fa-star" style="font-size: 20px; color: #D97706; margin-right: 6px;"></i>
+                <span style="font-family: 'Alfa Slab One', cursive; font-size: 24px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">x{multiplier}</span>
+              </div>
+            {/if}
+          </div>
+        </div>
+
+        <!-- Lives Display (Right) -->
+        <div class="flex items-center" style="background: rgba(255, 255, 255, 0.8); padding: 12px 16px; border-radius: 18px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); border: 2px solid rgba(0,0,0,0.1);">
+          {#each Array(4) as _, i}
+            <i class="fas fa-heart" style="font-size: 35px; color: {i < lives ? '#DC2626' : '#9CA3AF'}; margin-left: {i > 0 ? '10px' : '0'};"></i>
+          {/each}
+        </div>
       </div>
     </div>
   </div>
