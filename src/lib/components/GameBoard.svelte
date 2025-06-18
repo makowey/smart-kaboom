@@ -45,25 +45,25 @@
         </div>
       {/if}
     </div>
-    <div class="flex justify-center items-center gap-16 text-xl mb-6">
+    <div class="flex justify-center items-center gap-20 mb-8">
       <!-- Score Display -->
-      <div class="flex items-center bg-white bg-opacity-90 px-12 py-8 rounded-2xl backdrop-blur-sm">
-        <img src="/assets/coin.svg" alt="Coin" class="w-12 h-12 mr-6 drop-shadow-md" />
-        <span class="font-bold text-gray-800 drop-shadow-lg text-5xl" style="font-family: 'Alfa Slab One', cursive;">{score}</span>
+      <div class="flex items-center bg-white px-16 py-10 rounded-3xl shadow-2xl border-4 border-gray-200">
+        <img src="/assets/coin.svg" alt="Coin" class="w-16 h-16 mr-8 drop-shadow-md" />
+        <span class="font-bold text-black text-6xl" style="font-family: 'Alfa Slab One', cursive; text-shadow: none;">{score}</span>
       </div>
 
       <!-- Lives Display -->
-      <div class="flex items-center bg-white bg-opacity-90 px-10 py-8 rounded-2xl backdrop-blur-sm">
+      <div class="flex items-center bg-white px-14 py-10 rounded-3xl shadow-2xl border-4 border-gray-200">
         {#each Array(4) as _, i}
-          <i class="fas fa-heart text-4xl {i < lives ? 'text-red-500' : 'text-gray-300'} drop-shadow-md {i > 0 ? 'ml-5' : ''}"></i>
+          <i class="fas fa-heart text-5xl {i < lives ? 'text-red-600' : 'text-gray-400'} {i > 0 ? 'ml-6' : ''}"></i>
         {/each}
       </div>
 
       <!-- Multiplier Display -->
       {#if multiplier > 1}
-        <div class="flex items-center bg-white bg-opacity-90 px-12 py-8 rounded-2xl backdrop-blur-sm">
-          <i class="fas fa-star mr-6 text-yellow-500 text-5xl drop-shadow-md animate-spin-slow"></i>
-          <span class="font-bold text-gray-800 drop-shadow-lg text-5xl" style="font-family: 'Alfa Slab One', cursive;">x{multiplier}</span>
+        <div class="flex items-center bg-white px-16 py-10 rounded-3xl shadow-2xl border-4 border-yellow-300">
+          <i class="fas fa-star mr-8 text-yellow-600 text-6xl animate-spin-slow"></i>
+          <span class="font-bold text-black text-6xl" style="font-family: 'Alfa Slab One', cursive; text-shadow: none;">x{multiplier}</span>
         </div>
       {/if}
     </div>
