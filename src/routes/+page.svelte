@@ -24,7 +24,7 @@
     team1Name: 'Thunder Hawks',
     team2Name: 'Lightning Wolves',
     winCondition: 501,
-    minTries: 1,
+    minTries: 3,
     maxTries: 3
   };
 
