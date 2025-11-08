@@ -1,6 +1,7 @@
 <script>
   import Tile from './Tile.svelte';
   import { createBoard } from '../gameLogic.js';
+  import { onMount } from 'svelte';
 
   export let teamName;
   export let onTileFlip;
@@ -15,12 +16,48 @@
   export let onPassTurn = null;
   export let isWinner = false;
   export let winCondition = 501;
-  
+
   $: progressPercentage = Math.min((score / winCondition) * 100, 100);
 
   let board = createBoard();
+  let mounted = false;
+  let displayScore = 0;
+  let previousScore = 0;
+  let animatingScore = false;
 
   export let teamId; // Add teamId prop to identify which team this board belongs to
+
+  onMount(() => {
+    setTimeout(() => {
+      mounted = true;
+    }, teamId === 'team1' ? 100 : 300);
+  });
+
+  // Animate score changes
+  $: if (score !== previousScore) {
+    animateScore(previousScore, score);
+    previousScore = score;
+  }
+
+  function animateScore(from, to) {
+    animatingScore = true;
+    const duration = 800;
+    const steps = 30;
+    const increment = (to - from) / steps;
+    const stepDuration = duration / steps;
+    let currentStep = 0;
+
+    const interval = setInterval(() => {
+      currentStep++;
+      if (currentStep >= steps) {
+        displayScore = to;
+        animatingScore = false;
+        clearInterval(interval);
+      } else {
+        displayScore = Math.round(from + increment * currentStep);
+      }
+    }, stepDuration);
+  }
 
   function handleTileFlip(row, col, event) {
     const tileId = `${row}-${col}`;
@@ -30,15 +67,15 @@
   }
 </script>
 
-<div class="game-board p-6 rounded-2xl shadow-2xl backdrop-blur-sm transition-all duration-300 {teamId === 'team1' ? 'bg-orange-400 bg-opacity-20 border-4 border-orange-500' : 'bg-purple-400 bg-opacity-20 border-4 border-purple-500'} {isWinner ? 'glow-winner' : isActive ? 'glow-active' : 'inactive-board'}">
+<div class="game-board p-6 rounded-2xl shadow-2xl backdrop-blur-sm transition-all duration-300 {teamId === 'team1' ? 'bg-orange-400 bg-opacity-20 border-4 border-orange-500' : 'bg-purple-400 bg-opacity-20 border-4 border-purple-500'} {isWinner ? 'glow-winner' : isActive ? 'glow-active' : 'inactive-board'} {mounted ? 'board-enter' : 'board-hidden'}">
   <div class="text-center mb-4">
     <!-- Unified Team Header Panel -->
     <div style="background: rgba(255, 255, 255, 0.95); padding: 12px 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); border: 3px solid rgba(255,255,255,0.8); backdrop-filter: blur(10px); margin-bottom: 12px;">
       <div class="flex items-center justify-between">
         <!-- Score Display (Left) -->
-        <div class="flex items-center" style="background: rgba(255, 255, 255, 0.8); padding: 6px 12px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); border: 2px solid rgba(0,0,0,0.1);">
+        <div class="flex items-center score-container {animatingScore ? 'score-pulse' : ''}" style="background: rgba(255, 255, 255, 0.8); padding: 6px 12px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); border: 2px solid rgba(0,0,0,0.1);">
           <img src="/assets/coin.svg" alt="Coin" style="width: 26px; height: 26px; margin-right: 8px;" />
-          <span style="font-family: 'Alfa Slab One', cursive; font-size: 34px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">{score}</span>
+          <span style="font-family: 'Alfa Slab One', cursive; font-size: 34px; font-weight: bold; color: #000000; text-shadow: none; line-height: 1;">{displayScore}</span>
         </div>
 
         <!-- Team Name and Status (Center) -->
@@ -272,5 +309,53 @@
   @keyframes shimmer {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
+  }
+
+  /* Board entrance animation */
+  .board-hidden {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+
+  .board-enter {
+    animation: board-entrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  @keyframes board-entrance {
+    0% {
+      opacity: 0;
+      transform: translateY(50px) scale(0.9);
+    }
+    60% {
+      transform: translateY(-10px) scale(1.02);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Score animation */
+  .score-container {
+    transition: all 0.3s ease;
+  }
+
+  .score-pulse {
+    animation: score-pulse-animation 0.5s ease-out;
+  }
+
+  @keyframes score-pulse-animation {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.15);
+      box-shadow:
+        inset 0 2px 4px rgba(0,0,0,0.1),
+        0 0 20px rgba(255, 215, 0, 0.6);
+    }
+    100% {
+      transform: scale(1);
+    }
   }
 </style>

@@ -89,16 +89,20 @@
 <style>
   .tile {
     filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .tile.cursor-pointer:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px) scale(1.05);
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3))
+            drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
   }
-  
+
   .tile.cursor-pointer:active {
-    transform: translateY(1px) scale(0.98);
+    transform: translateY(0) scale(0.95);
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
   }
-  
+
   /* Front face with SVG background */
   .tile-face-front {
     width: 75px;
@@ -108,61 +112,94 @@
     background-repeat: no-repeat;
     background-position: center;
   }
-  
+
   /* Back face styling */
   .tile-face-back {
     width: 75px;
     height: 75px;
     border-radius: 8px;
     border: 2px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 
+    box-shadow:
       inset 0 2px 4px rgba(255, 255, 255, 0.2),
       inset 0 -2px 4px rgba(0, 0, 0, 0.2),
-      0 4px 8px rgba(0, 0, 0, 0.3);
+      0 4px 8px rgba(0, 0, 0, 0.3),
+      0 0 20px rgba(255, 255, 255, 0.1);
+    animation: tile-glow 0.5s ease-out;
   }
-  
+
+  @keyframes tile-glow {
+    0% {
+      box-shadow:
+        inset 0 2px 4px rgba(255, 255, 255, 0.2),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+        0 4px 8px rgba(0, 0, 0, 0.3),
+        0 0 40px rgba(255, 255, 255, 0.8);
+    }
+    100% {
+      box-shadow:
+        inset 0 2px 4px rgba(255, 255, 255, 0.2),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+        0 4px 8px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(255, 255, 255, 0.1);
+    }
+  }
+
   @keyframes spin-slow {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
   }
-  
+
   .animate-spin-slow {
     animation: spin-slow 3s linear infinite;
   }
-  
+
   .spinning-tile {
-    animation: tile-spin 1.5s linear;
+    animation: tile-spin-3d 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
-  
-  @keyframes tile-spin {
-    0% { 
-      transform: rotate(0deg) scale(1);
-      filter: brightness(1);
+
+  @keyframes tile-spin-3d {
+    0% {
+      transform: perspective(400px) rotateY(0deg) rotateX(0deg) scale(1);
+      filter: brightness(1) saturate(1);
     }
-    100% { 
-      transform: rotate(1800deg) scale(1.1);
-      filter: brightness(1.3);
+    25% {
+      transform: perspective(400px) rotateY(450deg) rotateX(180deg) scale(1.2);
+      filter: brightness(1.5) saturate(1.3);
+    }
+    50% {
+      transform: perspective(400px) rotateY(900deg) rotateX(360deg) scale(1.3);
+      filter: brightness(1.8) saturate(1.5);
+    }
+    75% {
+      transform: perspective(400px) rotateY(1350deg) rotateX(540deg) scale(1.2);
+      filter: brightness(1.5) saturate(1.3);
+    }
+    100% {
+      transform: perspective(400px) rotateY(1800deg) rotateX(720deg) scale(1.1);
+      filter: brightness(1.2) saturate(1.1);
     }
   }
-  
+
   .bomb-reveal {
     animation: bomb-grow 2s ease-out;
   }
-  
+
   @keyframes bomb-grow {
-    0% { 
+    0% {
       max-width: 40px;
       max-height: 40px;
       transform: scale(2.5);
-      filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.8));
+      filter: drop-shadow(0 0 20px rgba(255, 0, 0, 1))
+              drop-shadow(0 0 40px rgba(255, 140, 0, 0.8));
     }
-    50% { 
+    50% {
       max-width: 32px;
       max-height: 32px;
       transform: scale(2);
-      filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.6));
+      filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.8))
+              drop-shadow(0 0 30px rgba(255, 140, 0, 0.6));
     }
-    100% { 
+    100% {
       max-width: 16px;
       max-height: 16px;
       transform: scale(1);
