@@ -2,6 +2,8 @@
   import GameBoard from '$lib/components/GameBoard.svelte';
   import Notification from '$lib/components/Notification.svelte';
   import UpdateModal from '$lib/components/UpdateModal.svelte';
+  import ParticleEffect from '$lib/components/ParticleEffect.svelte';
+  import FloatingBackground from '$lib/components/FloatingBackground.svelte';
   import { createGameState, processTileFlip } from '$lib/gameLogic.js';
   import { checkForUpdates, isDesktopApp } from '$lib/services/versionCheck.js';
   import { onMount } from 'svelte';
@@ -20,6 +22,8 @@
   let updateInfo = null;
   let flyingCoins = [];
   let flyingHearts = [];
+  let particles = [];
+  let confettiParticles = [];
   let settings = {
     team1Name: 'Thunder Hawks',
     team2Name: 'Lightning Wolves',
@@ -137,14 +141,14 @@
 
   function createFlyingHeart(teamName, tilePosition) {
     const heartId = Date.now() + Math.random();
-    
+
     // Get the position of the clicked tile
     let startX = '50%', startY = '50%';
     if (tilePosition) {
       startX = tilePosition.x + 'px';
       startY = tilePosition.y + 'px';
     }
-    
+
     const heart = {
       id: heartId,
       team: teamName,
@@ -152,13 +156,56 @@
       startX: startX,
       startY: startY
     };
-    
+
     flyingHearts = [...flyingHearts, heart];
-    
+
     // Remove heart after animation completes
     setTimeout(() => {
       flyingHearts = flyingHearts.filter(h => h.id !== heartId);
     }, 2000);
+  }
+
+  function createParticleEffect(type, x, y, color = '#FFD700') {
+    const particleId = Date.now() + Math.random();
+    const particle = {
+      id: particleId,
+      type,
+      x,
+      y,
+      color
+    };
+
+    particles = [...particles, particle];
+
+    setTimeout(() => {
+      particles = particles.filter(p => p.id !== particleId);
+    }, 2000);
+  }
+
+  function createWinConfetti() {
+    // Create multiple confetti bursts across the screen
+    const positions = [
+      { x: window.innerWidth * 0.2, y: window.innerHeight * 0.3 },
+      { x: window.innerWidth * 0.5, y: window.innerHeight * 0.2 },
+      { x: window.innerWidth * 0.8, y: window.innerHeight * 0.3 },
+      { x: window.innerWidth * 0.35, y: window.innerHeight * 0.5 },
+      { x: window.innerWidth * 0.65, y: window.innerHeight * 0.5 }
+    ];
+
+    positions.forEach((pos, index) => {
+      setTimeout(() => {
+        const confettiId = Date.now() + Math.random();
+        confettiParticles = [...confettiParticles, {
+          id: confettiId,
+          x: pos.x,
+          y: pos.y
+        }];
+
+        setTimeout(() => {
+          confettiParticles = confettiParticles.filter(c => c.id !== confettiId);
+        }, 3000);
+      }, index * 200);
+    });
   }
 
   function toggleLegend() {
@@ -204,37 +251,49 @@
 
   function handleTileFlip(team, row, col, tileData, event) {
     if (gameState.currentTeam !== team || gameState.gameOver) return;
-    
+
     const previousTeam = gameState.currentTeam;
     let result;
-    
+
     // Get the tile position from the event
     const tilePosition = event?.tilePosition;
-    
+
     // For points, calculate but don't add immediately - wait for animation
     if (tileData.type === 'points' || tileData.type === 'try_again') {
-      const actualPoints = tileData.type === 'points' 
-        ? tileData.value * gameState[team].multiplier 
+      const actualPoints = tileData.type === 'points'
+        ? tileData.value * gameState[team].multiplier
         : tileData.value;
-      
+
       // Store original score for delayed update
       const originalScore = gameState[team].score;
-      
+
       // Process the tile flip but temporarily revert score changes for points
       result = processTileFlip(gameState, team, row, col, tileData);
-      
+
       // Revert the score change temporarily
       gameState[team].score = originalScore;
-      
+
       // Track pending points for bomb handling
       gameState[team].pendingPoints.push(actualPoints);
-      
+
+      // Create particle effect for points
+      if (tilePosition) {
+        createParticleEffect('sparkle', tilePosition.x, tilePosition.y, '#FFD700');
+      }
+
       // Create flying coin with callback to add points when animation completes
       createFlyingCoin(actualPoints, gameState[team].name, tilePosition, () => {
         // Only add points if they're still pending (not lost to bomb)
         if (gameState[team].pendingPoints.includes(actualPoints)) {
           gameState[team].score += actualPoints;
           gameState[team].pendingPoints = gameState[team].pendingPoints.filter(p => p !== actualPoints);
+
+          // Check for win condition
+          if (gameState[team].score >= settings.winCondition) {
+            gameState.gameOver = true;
+            gameState.winner = team;
+            createWinConfetti();
+          }
         }
         if (tileData.type === 'points') {
           gameState[team].multiplier = 1; // Reset multiplier after use
@@ -244,29 +303,42 @@
     } else if (tileData.type === 'bomb') {
       // For bombs, process immediately and cancel any pending points
       result = processTileFlip(gameState, team, row, col, tileData);
-      
+
+      // Create explosion particle effect
+      if (tilePosition) {
+        createParticleEffect('explosion', tilePosition.x, tilePosition.y, '#FF4500');
+      }
+
       // Cancel all pending points animations won't add points when they complete
       gameState[team].pendingPoints = [];
     } else {
       // For other non-point tiles, process normally
       result = processTileFlip(gameState, team, row, col, tileData);
-      
+
       // Create flying heart effect for life gained (only if actually gained)
       if (tileData.type === 'life' && result.message.includes('Extra life gained!')) {
         createFlyingHeart(gameState[team].name, tilePosition);
+        if (tilePosition) {
+          createParticleEffect('burst', tilePosition.x, tilePosition.y, '#FF69B4');
+        }
+      }
+
+      // Create particle effect for multiplier
+      if (tileData.type === 'multiplier' && tilePosition) {
+        createParticleEffect('sparkle', tilePosition.x, tilePosition.y, '#9333EA');
       }
     }
-    
+
     // Show tile result message
     currentMessage = `${gameState[team].name}: ${result.message}`;
-    
+
     // Clear message after 3 seconds, then show team change if needed
     clearTimeout(notificationTimeout);
     notificationTimeout = setTimeout(() => {
       // If team changed and game is not over, show team change
       if (gameState.currentTeam !== previousTeam && !gameState.gameOver && !result.continuePlay) {
         currentMessage = `${gameState[gameState.currentTeam].name}'s Turn!`;
-        
+
         // Clear team change message after 2 seconds
         setTimeout(() => {
           currentMessage = '';
@@ -275,7 +347,7 @@
         currentMessage = '';
       }
     }, 3000);
-    
+
     // Trigger reactivity
     gameState = gameState;
   }
@@ -941,9 +1013,71 @@
   .cancel-button:hover {
     background: linear-gradient(145deg, rgba(239, 68, 68, 1), rgba(220, 38, 38, 0.9));
   }
+
+  /* Animated Background */
+  .animated-background {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6, #2563eb);
+    background-size: 200% 200%;
+    animation: gradient-shift 15s ease infinite;
+  }
+
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* Enhanced Game Over styling */
+  .game-over-message {
+    animation: game-over-bounce 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  @keyframes game-over-bounce {
+    0% {
+      transform: scale(0) rotate(-180deg);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.2) rotate(10deg);
+    }
+    80% {
+      transform: scale(0.9) rotate(-5deg);
+    }
+    100% {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+  }
+
+  .winner-message {
+    animation: winner-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes winner-pulse {
+    0%, 100% {
+      transform: scale(1);
+      text-shadow:
+        0 0 20px rgba(255, 215, 0, 0.8),
+        0 0 40px rgba(255, 215, 0, 0.6),
+        0 4px 8px rgba(0, 0, 0, 0.5);
+    }
+    50% {
+      transform: scale(1.05);
+      text-shadow:
+        0 0 30px rgba(255, 215, 0, 1),
+        0 0 60px rgba(255, 215, 0, 0.8),
+        0 4px 12px rgba(0, 0, 0, 0.7);
+    }
+  }
 </style>
 
-<div class="min-h-screen py-8 fallback-container">
+<div class="min-h-screen py-8 fallback-container animated-background">
   <!-- Download Icons (Top Right Corner) -->
   <div class="download-corner">
     <a 
@@ -1018,12 +1152,12 @@
     </div>
 
     {#if gameState.gameOver}
-      <div class="text-center mb-6">
+      <div class="text-center mb-6 game-over-message">
         <h2 class="text-4xl font-bold text-white drop-shadow-lg mb-4" style="font-family: 'Alfa Slab One', cursive;">Game Over!</h2>
-        <p class="text-2xl font-bold drop-shadow font-comic text-white">
+        <p class="text-2xl font-bold drop-shadow font-comic text-white winner-message">
           {gameState.winner ? `🏆 ${gameState[gameState.winner].name} Win! 🏆` :
-           gameState.team1.score > gameState.team2.score ? '🏆 Thunder Hawks Win! 🏆' : 
-           gameState.team2.score > gameState.team1.score ? '🏆 Lightning Wolves Win! 🏆' : 
+           gameState.team1.score > gameState.team2.score ? '🏆 Thunder Hawks Win! 🏆' :
+           gameState.team2.score > gameState.team1.score ? '🏆 Lightning Wolves Win! 🏆' :
            '🤝 It\'s a Tie! 🤝'}
         </p>
       </div>
@@ -1404,16 +1538,46 @@
   {/each}
   
   <!-- Notification system -->
-  <Notification 
+  <Notification
     show={notification.show}
     message={notification.message}
     type={notification.type}
   />
-  
+
   <!-- Update Modal -->
-  <UpdateModal 
+  <UpdateModal
     visible={showUpdateModal}
     {updateInfo}
     on:close={closeUpdateModal}
   />
+
+  <!-- Floating Background Elements -->
+  <FloatingBackground />
+
+  <!-- Particle Effects -->
+  {#each particles as particle (particle.id)}
+    <ParticleEffect
+      type={particle.type}
+      x={particle.x}
+      y={particle.y}
+      color={particle.color}
+      duration={2000}
+      onComplete={() => {
+        particles = particles.filter(p => p.id !== particle.id);
+      }}
+    />
+  {/each}
+
+  <!-- Win Confetti -->
+  {#each confettiParticles as confetti (confetti.id)}
+    <ParticleEffect
+      type="confetti"
+      x={confetti.x}
+      y={confetti.y}
+      duration={3000}
+      onComplete={() => {
+        confettiParticles = confettiParticles.filter(c => c.id !== confetti.id);
+      }}
+    />
+  {/each}
 </div>
